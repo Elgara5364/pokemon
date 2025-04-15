@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokémon Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .ability-tooltip {
+        @apply hidden absolute top-6 left-0 bg-white p-3 rounded-md shadow-lg border z-20 w-64;
+      }
+      .ability-item:hover .ability-tooltip {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
+    <%
+      // Function to get gradient colors based on Pokémon type
+      function getTypeGradient(type) {
+        const typeColors = {
+          normal: 'from-gray-400 to-gray-500',
+          fire: 'from-red-500 to-orange-500',
+          water: 'from-blue-500 to-blue-600',
+          grass: 'from-green-500 to-green-600',
+          electric: 'from-yellow-400 to-yellow-500',
+          ice: 'from-blue-200 to-blue-400',
+          fighting: 'from-red-700 to-red-800',
+          poison: 'from-purple-500 to-purple-600',
+          ground: 'from-yellow-600 to-yellow-700',
+          flying: 'from-indigo-300 to-indigo-400',
+          psychic: 'from-pink-500 to-pink-600',
+          bug: 'from-green-600 to-green-700',
+          rock: 'from-yellow-800 to-yellow-900',
+          ghost: 'from-purple-700 to-purple-800',
+          dark: 'from-gray-800 to-gray-900',
+          dragon: 'from-indigo-700 to-indigo-800',
+          steel: 'from-gray-500 to-gray-600',
+          fairy: 'from-pink-300 to-pink-400'
+        };
+        
+        return typeColors[type] || 'from-indigo-500 to-purple-600';
+      }
+    %>
+    <div class="max-w-3xl mx-auto">
+      <!-- Header -->
+      <header class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-indigo-800">Pokémon Explorer</h1>
+        <p class="text-gray-600 mt-2">Search for any Pokémon to see its details</p>
+      </header>
+      
+      <!-- Search Form -->
+      <form method="post" action="/get-pokemon" id="pokemonForm" class="mb-8">
+        <div class="flex gap-4 max-w-xl mx-auto">
+          <input 
+            id="pokemonInput" 
+            name="pokemon" 
+            placeholder="Enter Pokémon name (e.g., pikachu, charizard)" 
+            class="flex-1 px-4 py-3 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+            required
+          />
+          <button 
+            type="submit"
+            class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+          >
+            Search
+          </button>
+        </div>
+      </form>
+
+      <!-- Error Message -->
+      <% if (locals.error) { %>
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-8 max-w-xl mx-auto">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <!-- Error icon -->
+              <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm"><%= error %></p>
+            </div>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Pokemon Details -->
+      <% if (locals.pokemon) { %>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <!-- Basic Info -->
+          <div class="bg-gradient-to-r <%= types && types.length > 0 ? getTypeGradient(types[0]) : 'from-indigo-500 to-purple-600' %> p-6 text-white">
+            <div class="flex items-center gap-6">
+              <img 
+                src="<%= pokemon.sprites.other['official-artwork'].front_default %>" 
+                alt="<%= pokemon.name %>" 
+                class="w-32 h-32 bg-white bg-opacity-20 rounded-full p-2"
+              />
+              <div>
+                <h2 class="text-3xl font-bold capitalize"><%= pokemon.name %></h2>
+                <p class="opacity-80">#<%= pokemon.id.toString().padStart(3, '0') %></p>
+                <div class="flex gap-2 mt-3">
+                  <% types.forEach(type => { %>
+                    <span class="px-3 py-1 bg-white bg-opacity-30 rounded-full text-sm font-medium capitalize">
+                      <%= type %>
+                    </span>
+                  <% }); %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="p-6">
+            <!-- Abilities Section -->
+            <section class="mb-8">
+              <h3 class="text-xl font-semibold mb-4 text-gray-800">Abilities</h3>
+              <div class="flex flex-wrap gap-3">
+                <% ability.forEach((abilityName, index) => { %>
+                  <div class="ability-item relative px-4 py-2 bg-indigo-100 rounded-lg text-indigo-700 font-medium capitalize cursor-help">
+                    <strong ><%= abilityName %></strong>
+                    <div class="ability-tooltip">
+                      <p class="text-sm text-gray-700"><%= abilityDescriptions[index] %></p>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            </section>
+
+            <!-- Stats Section -->
+            <% if (stats && stats.length > 0) { %>
+              <section class="mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Base Stats</h3>
+                <div class="grid gap-4">
+                  <% 
+                    // Map stat names to more readable names
+                    const statNames = {
+                      'hp': 'HP',
+                      'attack': 'Attack',
+                      'defense': 'Defense',
+                      'special-attack': 'Sp. Atk',
+                      'special-defense': 'Sp. Def',
+                      'speed': 'Speed'
+                    };
+                    
+                    // Map stat names to colors
+                    const statColors = {
+                      'hp': 'bg-red-500',
+                      'attack': 'bg-orange-500',
+                      'defense': 'bg-yellow-500',
+                      'special-attack': 'bg-blue-500',
+                      'special-defense': 'bg-green-500',
+                      'speed': 'bg-pink-500'
+                    };
+                  %>
+                  
+                  <% stats.forEach(stat => { %>
+                    <div class="flex items-center gap-3">
+                      <div class="w-20 text-right font-medium">
+                        <%= statNames[stat.name] || stat.name %>
+                      </div>
+                      <div class="text-right w-10 font-semibold">
+                        <%= stat.value %>
+                      </div>
+                      <div class="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div 
+                          class="h-full <%= statColors[stat.name] || 'bg-gray-500' %> rounded-full transition-all duration-1000"
+                          style="width: <%= stat.percentage %>%"
+                        ></div>
+                      </div>
+                      <div class="w-8 text-xs text-gray-500"><%= stat.percentage %>%</div>
+                    </div>
+                  <% }); %>
+                  
+                  <!-- Total Stats -->
+                  <div class="flex items-center gap-3 mt-2 pt-2 border-t">
+                    <div class="w-20 text-right font-bold">Total</div>
+                    <div class="text-right w-10 font-bold">
+                      <%= stats.reduce((sum, stat) => sum + stat.value, 0) %>
+                    </div>
+                    <div class="flex-1"></div>
+                    <div class="w-8"></div>
+                  </div>
+                </div>
+              </section>
+            <% } %>
+
+            <!-- Evolution Chain -->
+            <% if (evolutionStages && evolutionStages.length > 0) { %>
+              <section>
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Evolution Chain</h3>
+                <div class="flex items-center flex-wrap gap-2">
+                  <% evolutionStages.forEach((stage, index) => { %>
+                    <div class="text-center bg-gray-50 px-4 py-3 rounded-lg">
+                      <span class="text-xs text-gray-500 block">Stage <%= index + 1 %></span>
+                      <p class="font-medium capitalize"><%= stage %></p>
+                    </div>
+                    <% if (index < evolutionStages.length - 1) { %>
+                      <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    <% } %>
+                  <% }); %>
+                </div>
+              </section>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Footer -->
+      <footer class="mt-12 text-center text-gray-500 text-sm">
+        <p>Data provided by <a href="https://pokeapi.co/" class="underline">PokéAPI</a></p>
+      </footer>
+    </div>
+  </body>
+</html>
