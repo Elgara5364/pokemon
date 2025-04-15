@@ -4,7 +4,6 @@ import bodyParser from "body-parser";
 
 const app = express();
 const port = 3000;
-const DOMAIN = "https://pokemon-snowy-ten.vercel.app/";
 
 // API endpoints
 const API = {
@@ -18,8 +17,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Route definitions
 
-app.get(DOMAIN, (req, res) => res.render("index.ejs"));
-app.post(DOMAIN + "get-pokemon", handlePokemonRequest);
+app.get("/", (req, res) => res.render("index.ejs"));
+app.post("/get-pokemon", handlePokemonRequest);
 
 // Start server
 app.listen(port, () => console.log(`Server running on port: ${port}`));
