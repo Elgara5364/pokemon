@@ -55,7 +55,11 @@ async function handlePokemonRequest(req, res) {
 async function fetchPokemonData(pokemonName) {
   // Get basic Pokemon data
   const { data: pokemon } = await axios.get(API.POKEMON + pokemonName);
+  // console.log(pokemon);
 
+  // Extract Pokemon Description
+  const pokemonDescription = await fetchPokemonDesc(pokemon.id);
+  // console.log(pokemonDescription);
   // Extract types
   const types = pokemon.types.map((type) => type.type.name);
 
@@ -77,6 +81,7 @@ async function fetchPokemonData(pokemonName) {
 
   return {
     pokemon,
+    pokemonDescription,
     types,
     ability: abilities,
     abilityDescriptions,
@@ -133,4 +138,14 @@ function extractEvolutionStages(chain) {
   }
 
   return stages;
+}
+
+async function fetchPokemonDesc(pokemonId) {
+  const { data } = await axios.get(API.SPECIES + pokemonId);
+  const pokemonDescription = data.flavor_text_entries.find((entry) => {
+    entry.version.name === "emerald";
+    return entry;
+  });
+
+  return pokemonDescription ? pokemonDescription.flavor_text : "null";
 }
