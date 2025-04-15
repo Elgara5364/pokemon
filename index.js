@@ -22,18 +22,50 @@ app.set("view engine", "ejs");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.set("views", path.join(__dirname, "views"));
-app.get("/", (req, res) => res.render("index.ejs"));
-app.post("/get-pokemon", handlePokemonRequest);
+app.get("/", async (req, res) => {
+  const { result, pokemonShortData } = await handleAllPokemonData();
+  res.render("home.ejs", { result, pokemonShortData }); //kalau tidak ada curly brace maka data tidak akan kekirim
+});
 
 // Start server
 app.listen(port, () => console.log(`Server running on port: ${port}`));
 
+async function handleAllPokemonData() {
+  try {
+    const { data: result } = await axios.get(API.POKEMON);
+    const pokemonShortData = await Promise.all(
+      result.results.map(async (pokemon) => {
+        const fetchImgPokemon = await axios.get(pokemon.url);
+        // console.log(fetchImgPokemon.data.types[0]);
+        const data = {
+          imgPokemon:
+            fetchImgPokemon.data.sprites.other["official-artwork"]
+              .front_default,
+          id: fetchImgPokemon.data.id,
+          types: fetchImgPokemon.data.types.map((type) => {
+            return type.type.name;
+          }),
+        };
+        return data;
+      })
+    );
+    // console.log(pokemonShortData);
+    return { result, pokemonShortData };
+  } catch (error) {
+    return { data: null };
+  }
+}
+app.post("/get-pokemon", handlePokemonRequest);
+
+app.get("/get-pokemon/:pokemon", handlePokemonRequest);
 /**
  * Handle Pokemon search request
  */
 async function handlePokemonRequest(req, res) {
   try {
-    const pokemonName = req.body.pokemon.toLowerCase().trim();
+    const pokemonName =
+      req.params.pokemon || req.body.pokemon.toLowerCase().trim();
+    // console.log(pokemonName);
 
     // Fetch all Pokemon data in parallel
     const pokemonData = await fetchPokemonData(pokemonName);
@@ -50,18 +82,15 @@ async function handlePokemonRequest(req, res) {
 }
 
 /**
- * Fetch all Pokemon data from the API
+ * Fetch Spesific Pokemon data from the API
  */
 async function fetchPokemonData(pokemonName) {
   // Get basic Pokemon data
-  const { data: pokemon } = await axios.get(API.POKEMON + pokemonName);
-  // console.log(pokemon);
-
-  // Extract Pokemon Description
+  const pokemon = await fetchPokemon(pokemonName);
   const pokemonDescription = await fetchPokemonDesc(pokemon.id);
-  // console.log(pokemonDescription);
+
   // Extract types
-  const types = pokemon.types.map((type) => type.type.name);
+  const types = await fetchTypesPokemon(pokemon);
 
   // Extract and process abilities
   const abilities = pokemon.abilities.map((item) => item.ability.name);
@@ -148,4 +177,14 @@ async function fetchPokemonDesc(pokemonId) {
   });
 
   return pokemonDescription ? pokemonDescription.flavor_text : "null";
+}
+
+async function fetchTypesPokemon(pokemon) {
+  const types = pokemon.types.map((type) => type.type.name);
+  return types;
+}
+
+async function fetchPokemon(pokemonName) {
+  const { data: pokemon } = await axios.get(API.POKEMON + pokemonName);
+  return pokemon;
 }
