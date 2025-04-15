@@ -16,7 +16,8 @@ const API = {
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Route definitions
-
+app.set("view engine", "ejs");
+app.set("views", "views"); // folder views
 app.get("/", (req, res) => res.render("index.ejs"));
 app.post("/get-pokemon", handlePokemonRequest);
 
