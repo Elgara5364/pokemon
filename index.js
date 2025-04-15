@@ -1,9 +1,9 @@
 import express from "express";
 import axios from "axios";
 import bodyParser from "body-parser";
+import * as path from "path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
@@ -19,7 +19,10 @@ const API = {
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Route definitions
-app.get("/", (req, res) => res.render(__dirname + "./views/index.ejs"));
+app.set("view engine", "ejs");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.set("views", path.join(__dirname, "views"));
+app.get("/", (req, res) => res.render("index.ejs"));
 app.post("/get-pokemon", handlePokemonRequest);
 
 // Start server
