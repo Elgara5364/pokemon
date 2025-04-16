@@ -80,6 +80,7 @@ async function handlePokemonRequest(req, res) {
   try {
     const pokemonName =
       req.params.pokemon || req.body.pokemon.toLowerCase().trim();
+    console.log(pokemonName);
 
     const pokemonData = await fetchPokemonData(pokemonName);
 
