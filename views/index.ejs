@@ -90,16 +90,16 @@
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
           <!-- Basic Info -->
           <div class="bg-gradient-to-r <%= types && types.length > 0 ? getTypeGradient(types[0]) : 'from-indigo-500 to-purple-600' %> p-6 text-white">
-            <div class="flex flex-col items-center sm:flex-row gap-6">
+            <div class="flex flex-col items-center sm:flex-row gap-3">
               <img 
                 src="<%= pokemon.sprites.other['official-artwork'].front_default %>" 
                 alt="<%= pokemon.name %>" 
-                class="w-32 h-32 bg-white bg-opacity-20 rounded-full p-2"
+                class="size-48 bg-white bg-opacity-20 rounded-full p-2"
               />
-              <div>
-                <h2 class="opacity-80">#<%= pokemon.id.toString().padStart(3, '0') %></>
+              <div class="text-center sm:text-start mb-3">
+                <h2 class="opacity-80 font-bold text-xl">#<%= pokemon.id.toString().padStart(4, '0') %></>
                 <h2 class="text-3xl font-bold capitalize"><%= pokemon.name %></h2>
-                <div class="flex gap-2 mt-3">
+                <div class="flex gap-2 mt-3 justify-center sm:justify-start">
                   <% types.forEach(type => { %>
                     <span class="px-3 py-1 bg-white bg-opacity-30 rounded-full text-sm font-medium capitalize">
                       <%= type %>
@@ -107,7 +107,7 @@
                   <% }); %>
                 </div>
               </div>
-              <div class="h-[100px] text-center sm:text-left"><h3>Description : </h3><p><%= pokemonDescription %> </p></div>
+              <div class="h-fit text-center sm:text-left"><h3>Description : </h3><p><%= pokemonDescription %> </p></div>
 
             </div>
           </div>
