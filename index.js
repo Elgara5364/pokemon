@@ -23,105 +23,108 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.set("views", path.join(__dirname, "views"));
 app.get("/", async (req, res) => {
-  const { result, pokemonShortData } = await handleAllPokemonData();
-  res.render("home.ejs", { result, pokemonShortData }); //kalau tidak ada curly brace maka data tidak akan kekirim
+  const page = parseInt(req.query.page) || 1;
+  const limit = 20; // Number of Pokémon per page
+  const { result, pokemonShortData, totalPages } = await fetchAllPokemonData(
+    page,
+    limit
+  );
+  const pagination = getPagination(page, totalPages);
+  res.render("home.ejs", {
+    result,
+    pokemonShortData,
+    currentPage: page,
+    totalPages,
+    pagination,
+  });
 });
 
 // Start server
 app.listen(port, () => console.log(`Server running on port: ${port}`));
 
-async function handleAllPokemonData() {
+// Fetch all Pokémon data with pagination
+async function fetchAllPokemonData(page = 1, limit = 20) {
   try {
-    const { data: result } = await axios.get(API.POKEMON);
-    const pokemonShortData = await Promise.all(
-      result.results.map(async (pokemon) => {
-        const fetchImgPokemon = await axios.get(pokemon.url);
-        // console.log(fetchImgPokemon.data.types[0]);
-        const data = {
-          imgPokemon:
-            fetchImgPokemon.data.sprites.other["official-artwork"]
-              .front_default,
-          id: fetchImgPokemon.data.id,
-          types: fetchImgPokemon.data.types.map((type) => {
-            return type.type.name;
-          }),
-        };
-        return data;
-      })
+    const offset = (page - 1) * limit;
+    const { data: result } = await axios.get(
+      `${API.POKEMON}?offset=${offset}&limit=${limit}`
     );
-    // console.log(pokemonShortData);
-    return { result, pokemonShortData };
+    const totalPages = Math.ceil(result.count / limit);
+    const pokemonShortData = await fetchPokemonShortData(result.results);
+    return { result, pokemonShortData, totalPages };
   } catch (error) {
-    return { data: null };
+    console.error("Error fetching all Pokémon data:", error.message);
+    return { result: null, pokemonShortData: [], totalPages: 0 };
   }
 }
-app.post("/get-pokemon", handlePokemonRequest);
 
+// Fetch short data for each Pokémon
+async function fetchPokemonShortData(pokemonList) {
+  return Promise.all(
+    pokemonList.map(async (pokemon) => {
+      const { data } = await axios.get(pokemon.url);
+      return {
+        imgPokemon: data.sprites.other["official-artwork"].front_default,
+        id: data.id,
+        types: data.types.map((type) => type.type.name),
+      };
+    })
+  );
+}
+
+// Handle Pokémon search request
+app.post("/get-pokemon", handlePokemonRequest);
 app.get("/get-pokemon/:pokemon", handlePokemonRequest);
-/**
- * Handle Pokemon search request
- */
+
 async function handlePokemonRequest(req, res) {
   try {
     const pokemonName =
       req.params.pokemon || req.body.pokemon.toLowerCase().trim();
-    // console.log(pokemonName);
 
-    // Fetch all Pokemon data in parallel
     const pokemonData = await fetchPokemonData(pokemonName);
-    // console.log(pokemonData);
 
-    // Render the view with all data
     res.render("index.ejs", pokemonData);
   } catch (error) {
-    console.error("Error fetching Pokemon data:", error.message);
+    console.error("Error fetching Pokémon data:", error.message);
     res.render("index.ejs", {
-      error: error.response?.data?.message || "Pokemon not found",
+      error: error.response?.data?.message || "Pokémon not found",
     });
   }
 }
 
-/**
- * Fetch Spesific Pokemon data from the API
- */
+// Fetch specific Pokémon data
 async function fetchPokemonData(pokemonName) {
-  // Get basic Pokemon data
   const pokemon = await fetchPokemon(pokemonName);
-  const pokemonDescription = await fetchPokemonDesc(pokemon.id);
-
-  // Extract types
-  const types = await fetchTypesPokemon(pokemon);
-
-  // Extract and process abilities
-  const abilities = pokemon.abilities.map((item) => item.ability.name);
-  const abilityUrls = pokemon.abilities.map((item) => item.ability.url);
-  const abilityDescriptions = await fetchAbilityDescriptions(abilityUrls);
-
-  // Extract stats
-  const stats = pokemon.stats.map((stat) => ({
-    name: stat.stat.name,
-    value: stat.base_stat,
-    // Calculate percentage for visualization (assuming max stat is 255)
-    percentage: Math.min(Math.round((stat.base_stat / 255) * 100), 100),
-  }));
-
-  // Get evolution chain
+  const pokemonDescription = await fetchPokemonDescription(pokemon.id);
+  const types = await fetchTypes(pokemon);
+  const abilities = await fetchAbilities(pokemon);
+  const stats = await fetchStats(pokemon);
   const evolutionStages = await fetchEvolutionChain(pokemon.id);
 
   return {
     pokemon,
     pokemonDescription,
     types,
-    ability: abilities,
-    abilityDescriptions,
+    abilities,
     evolutionStages,
     stats,
   };
 }
 
-/**
- * Fetch ability descriptions in English
- */
+// Fetch Pokémon abilities and their descriptions
+async function fetchAbilities(pokemon) {
+  const abilityUrls = pokemon.abilities.map((item) => item.ability.url);
+  const abilityDescriptions = await fetchAbilityDescriptions(abilityUrls);
+
+  const dataAbility = pokemon.abilities.map((item, index) => ({
+    ability: item.ability.name,
+    description: abilityDescriptions[index],
+  }));
+
+  return { dataAbility };
+}
+
+// Fetch ability descriptions in English
 async function fetchAbilityDescriptions(abilityUrls) {
   return Promise.all(
     abilityUrls.map(async (url) => {
@@ -136,55 +139,85 @@ async function fetchAbilityDescriptions(abilityUrls) {
   );
 }
 
-/**
- * Fetch evolution chain for a Pokemon
- */
+// Fetch evolution chain for a Pokémon
 async function fetchEvolutionChain(pokemonId) {
-  // Get species data which contains evolution chain URL
-  const { data: speciesData } = await axios.get(API.SPECIES + pokemonId);
-
-  // Get evolution chain data
+  const { data: speciesData } = await axios.get(`${API.SPECIES}${pokemonId}`);
   const { data: evolutionData } = await axios.get(
     speciesData.evolution_chain.url
   );
-
-  // Extract evolution stages
   return extractEvolutionStages(evolutionData.chain);
 }
 
-/**
- * Extract ordered evolution stages from chain data
- */
+// Extract ordered evolution stages from chain data
 function extractEvolutionStages(chain) {
   const stages = [];
   let current = chain;
 
-  // Follow the chain until there are no more evolutions
   while (current) {
     stages.push(current.species.name);
-    // Move to the next evolution (if any)
     current = current.evolves_to[0];
   }
 
   return stages;
 }
 
-async function fetchPokemonDesc(pokemonId) {
-  const { data } = await axios.get(API.SPECIES + pokemonId);
-  const pokemonDescription = data.flavor_text_entries.find((entry) => {
-    entry.version.name === "emerald";
-    return entry;
-  });
-
-  return pokemonDescription ? pokemonDescription.flavor_text : "null";
+// Fetch Pokémon description
+async function fetchPokemonDescription(pokemonId) {
+  const { data } = await axios.get(`${API.SPECIES}${pokemonId}`);
+  const descriptionEntry = data.flavor_text_entries.find(
+    (entry) => entry.version.name === "emerald"
+  );
+  return descriptionEntry
+    ? descriptionEntry.flavor_text
+    : "No description available";
 }
 
-async function fetchTypesPokemon(pokemon) {
-  const types = pokemon.types.map((type) => type.type.name);
-  return types;
+// Fetch Pokémon types
+async function fetchTypes(pokemon) {
+  return pokemon.types.map((type) => type.type.name);
 }
 
+// Fetch Pokémon data by name
 async function fetchPokemon(pokemonName) {
-  const { data: pokemon } = await axios.get(API.POKEMON + pokemonName);
-  return pokemon;
+  try {
+    const { data } = await axios.get(`${API.POKEMON}${pokemonName}`);
+    return data;
+  } catch (error) {
+    console.error("Terjadi kesalahan saat mengambil data Pokémon:", error);
+    throw error;
+  }
+}
+
+// Fetch Pokémon stats
+async function fetchStats(pokemon) {
+  return pokemon.stats.map((stat) => ({
+    name: stat.stat.name,
+    value: stat.base_stat,
+    // Calculate percentage for visualization (assuming max stat is 255)
+    percentage: Math.min(Math.round((stat.base_stat / 255) * 100), 100),
+  }));
+}
+
+// Pagination logic
+function getPagination(currentPage, totalPages) {
+  const pagination = [];
+  const maxPagesToShow = 2; // Number of pages to show around the current page
+
+  // Always show the first page
+  pagination.push(1);
+
+  // Calculate the range of pages to show
+  const startPage = Math.max(2, currentPage - maxPagesToShow);
+  const endPage = Math.min(totalPages - 1, currentPage + maxPagesToShow);
+
+  for (let i = startPage; i <= endPage; i++) {
+    pagination.push(i);
+  }
+
+  // Always show the last page
+  if (totalPages > 1) {
+    pagination.push(totalPages);
+  }
+
+  return pagination;
 }
