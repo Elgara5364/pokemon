@@ -117,10 +117,9 @@
             <!-- Abilities Section -->
             <section class="mb-8">
               <h3 class="text-xl font-semibold mb-4 text-gray-800 text-center sm:text-left">Abilities</h3>
-              <div class="flex flex-cols gap-3">
+              <div class="flex-cols sm:flex flex-wrap gap-3">
                 <% abilities.dataAbility.map((item, idx) => { %>
-
-                  <div class="flex-1 ability-item relative px-4 py-2 bg-indigo-100 rounded-lg text-indigo-700 font-medium capitalize" >
+                  <div class="flex-1 ability-item relative px-4 py-2 bg-indigo-100 rounded-lg text-indigo-700 font-medium capitalize mb-3" >
                   <h3 class="font-semibold"> <%= item.ability %></h3>
                   <p class="text-sm text-gray-700 ability-tooltip"> <%= item.description %> </p>
                   </div>
