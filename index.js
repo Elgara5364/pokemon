@@ -49,7 +49,6 @@ app.get("/", async (req, res) => {
   if (!req.session.favorites) {
     req.session.favorites = [];
   }
-  console.log(req.session.favorites[0]);
 
   res.render("home.ejs", {
     result,

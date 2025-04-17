@@ -39,7 +39,6 @@
       <!-- Header -->
       <header class="text-center mb-8">
         <h1 class="text-4xl font-bold text-indigo-800"><a href="/">Pokemon Explorer</a></h1>
-        <a href="/favorites">Lihat Favorit</a>
 
         <p class="text-gray-600 mt-2">Search for any Pokémon to see its details</p>
       </header>
@@ -60,6 +59,8 @@
           >
             Search
           </button>
+        <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg">Lihat Favorit</a>
+
         </div>
       </form>
 
@@ -67,32 +68,35 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <% result.results.map((pokemon, idx) => { %>
           <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col p-6 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
-            <% 
-            const pokemonId = pokemonShortData[idx].id ;
-            const pokemonImg = pokemonShortData[idx].imgPokemon ;
-            const isFavorite = favorites.some((p) => {
-              let x = parseInt(p.id)
-              return x === pokemonId
-              
-            });
-            %>
+            <div class="flex justify-between"> 
+              <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %></p>
+              <% 
+              const pokemonId = pokemonShortData[idx].id ;
+              const pokemonImg = pokemonShortData[idx].imgPokemon ;
+              const isFavorite = favorites.some((p) => {
+                let x = parseInt(p.id)
+                return x === pokemonId
+                
+              });
+              %>
+              <% if (isFavorite) { %>
+                <form action="/remove-favorite" method="POST">
+                  <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
+                  <button type="submit" class="favorite-button favorited"><img src="images/heart-solid.svg" alt="remove Favorit" class="size-5"></button>
+                </form>
+              <% } else { %>
+                <form action="/add-favorite" method="POST">
+                  <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
+                  <input type="hidden" name="pokemonName" value="<%= pokemon.name %>">
+                  <input type="hidden" name="pokemonImage" value="<%= pokemonShortData[idx].imgPokemon %>">
+                  <button type="submit" class="favorite-button"> <img src="/images/heart-regular.svg" alt="add Favorit" class="size-5"> </button>
+                </form>
+              <% } %>
+            </div>
            
-            <% if (isFavorite) { %>
-              <form action="/remove-favorite" method="POST">
-                <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
-                <button type="submit" class="favorite-button favorited"><img src="images/heart-solid.svg" alt="remove Favorit" class="size-5"></button>
-              </form>
-            <% } else { %>
-              <form action="/add-favorite" method="POST">
-                <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
-                <input type="hidden" name="pokemonName" value="<%= pokemon.name %>">
-                <input type="hidden" name="pokemonImage" value="<%= pokemonShortData[idx].imgPokemon %>">
-                <button type="submit" class="favorite-button"> <img src="/images/heart-regular.svg" alt="add Favorit" class="size-5"> </button>
-              </form>
-            <% } %>
             <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
-            <h2 class="text-2xl font-semibold"><%= pokemon.name %></h2>
-            <p class="text-lg">#<%= pokemonShortData[idx].id %></p>
+            <h2 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h2>
+            
             <div class="flex justify-center gap-2">
               <% pokemonShortData[idx].types.forEach(type => { %>
                 <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
