@@ -3,6 +3,7 @@ import axios from "axios";
 import bodyParser from "body-parser";
 import * as path from "path";
 import { fileURLToPath } from "url";
+import session from "express-session";
 
 const app = express();
 const port = 3000;
@@ -22,6 +23,18 @@ app.set("view engine", "ejs");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
+
+// express-session config
+app.use(
+  session({
+    secret: "pokemon-secret-key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 },
+  })
+);
+
 app.get("/", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 20; // Number of Pokémon per page
@@ -29,13 +42,22 @@ app.get("/", async (req, res) => {
     page,
     limit
   );
+
   const pagination = getPagination(page, totalPages);
+
+  // initialize favorite array
+  if (!req.session.favorites) {
+    req.session.favorites = [];
+  }
+  console.log(req.session.favorites[0]);
+
   res.render("home.ejs", {
     result,
     pokemonShortData,
     currentPage: page,
     totalPages,
     pagination,
+    favorites: req.session.favorites,
   });
 });
 
@@ -80,7 +102,6 @@ async function handlePokemonRequest(req, res) {
   try {
     const pokemonName =
       req.params.pokemon || req.body.pokemon.toLowerCase().trim();
-    console.log(pokemonName);
 
     const pokemonData = await fetchPokemonData(pokemonName);
 
@@ -222,3 +243,54 @@ function getPagination(currentPage, totalPages) {
 
   return pagination;
 }
+
+//ROUTE TO FAVORITE PAGE
+app.get("/favorites", (req, res) => {
+  // Inisialisasi array favorit jika belum ada
+  if (!req.session.favorites) {
+    req.session.favorites = [];
+  }
+
+  // Render halaman favorit
+  res.render("favorites", {
+    favorites: req.session.favorites,
+  });
+});
+
+// ROUTE TO ADD FAVORIT POKEMON
+app.post("/add-favorite", (req, res) => {
+  const { pokemonId, pokemonName, pokemonImage } = req.body;
+
+  if (!req.session.favorites) {
+    req.session.favorites = [];
+  }
+
+  const isAlreadyFavorite = req.session.favorites.some(
+    (p) => p.id === pokemonId
+  );
+
+  if (!isAlreadyFavorite) {
+    req.session.favorites.push({
+      id: pokemonId,
+      name: pokemonName,
+      Image: pokemonImage,
+    });
+  }
+
+  res.redirect(req.headers.referer || "/");
+});
+
+//ROUTE TO REMOVE FAVORITE POKEMON
+app.post("/remove-favorite", (req, res) => {
+  const { pokemonId } = req.body;
+
+  // Hapus Pokemon dari array favorit
+  if (req.session.favorites) {
+    req.session.favorites = req.session.favorites.filter(
+      (p) => p.id !== pokemonId
+    );
+  }
+
+  // Redirect kembali ke halaman sebelumnya
+  res.redirect(req.headers.referer || "/");
+});
