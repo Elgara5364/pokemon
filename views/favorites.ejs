@@ -24,7 +24,7 @@
     }
   </style>
 </head>
-<body class="max-w-3xl mx-auto">
+<body class="max-w-3xl mx-auto py-4">
 
   <%
   // Function to get gradient colors based on Pokémon type
@@ -56,7 +56,7 @@
 
   <div class="flex justify-between mb-8">
   <h1 class="text-4xl font-bold text-indigo-800">Pokemon Favorit</h1>
-  <a href="/">Kembali ke Daftar Pokemon</a></div>
+  <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Kembali</a></div>
   
   <div class="pokemon-list ">
     <% if (favorites.length === 0) { %>
@@ -64,7 +64,7 @@
     <% } else { %>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <% favorites.forEach(pokemon => { %>
-          <a href="/get-pokemon/<%= pokemon.name %>" class="flex flex-col p-6 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
+          <a href="/get-pokemon/<%= pokemon.name %>" class="flex flex-col px-6 py-3 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
           <div class="flex justify-between"><p class="text-lg font-bold">#<%= pokemon.id.toString().padStart(4, '0') %></p><form action="/remove-favorite" method="POST">
             <input type="hidden" name="pokemonId" value="<%= pokemon.id %>">
             <button type="submit" ><img src="/images/heart-solid.svg" alt="add Favorit" class="size-5"> </button>
