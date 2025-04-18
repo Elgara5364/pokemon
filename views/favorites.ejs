@@ -24,25 +24,62 @@
     }
   </style>
 </head>
-<body>
-  <h1 class="font-bold text-xl">Pokemon Favorit</h1>
-  <a href="/">Kembali ke Daftar Pokemon</a>
+<body class="max-w-3xl mx-auto">
+
+  <%
+  // Function to get gradient colors based on Pokémon type
+  function getTypeGradient(type) {
+    const typeColors = {
+      normal: 'from-gray-400 to-gray-500',
+      fire: 'from-red-500 to-orange-500',
+      water: 'from-blue-500 to-blue-600',
+      grass: 'from-green-500 to-green-600',
+      electric: 'from-yellow-400 to-yellow-500',
+      ice: 'from-blue-200 to-blue-400',
+      fighting: 'from-red-700 to-red-800',
+      poison: 'from-purple-500 to-purple-600',
+      ground: 'from-yellow-600 to-yellow-700',
+      flying: 'from-indigo-300 to-indigo-400',
+      psychic: 'from-pink-500 to-pink-600',
+      bug: 'from-green-600 to-green-700',
+      rock: 'from-yellow-800 to-yellow-900',
+      ghost: 'from-purple-700 to-purple-800',
+      dark: 'from-gray-800 to-gray-900',
+      dragon: 'from-indigo-700 to-indigo-800',
+      steel: 'from-gray-500 to-gray-600',
+      fairy: 'from-pink-300 to-pink-400'
+    };
+    
+    return typeColors[type] || 'from-indigo-500 to-purple-600';
+  }
+%>
+
+  <div class="flex justify-between mb-8">
+  <h1 class="text-4xl font-bold text-indigo-800">Pokemon Favorit</h1>
+  <a href="/">Kembali ke Daftar Pokemon</a></div>
   
-  <div class="pokemon-list">
+  <div class="pokemon-list ">
     <% if (favorites.length === 0) { %>
       <p>Belum ada Pokemon favorit.</p>
     <% } else { %>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <% favorites.forEach(pokemon => { %>
-          <a href="/get-pokemon/<%= pokemon.name %>" class="flex flex-col p-6 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105">
-
-          <img src="<%= pokemon.Image %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
-          <h3 class="text-2xl font-semibold"><%= pokemon.name %></h3>
-          
-          <form action="/remove-favorite" method="POST">
+          <a href="/get-pokemon/<%= pokemon.name %>" class="flex flex-col p-6 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
+          <div class="flex justify-between"><p class="text-lg font-bold">#<%= pokemon.id.toString().padStart(4, '0') %></p><form action="/remove-favorite" method="POST">
             <input type="hidden" name="pokemonId" value="<%= pokemon.id %>">
-            <button type="submit" class="favorite-button">Hapus dari Favorit</button>
-          </form>
+            <button type="submit" ><img src="/images/heart-solid.svg" alt="add Favorit" class="size-5"> </button>
+          </form></div>
+          <img src="<%= pokemon.Image %>" alt="<%= pokemon.name %>" class="mx-auto mb-2 ">
+          <h3 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h3>
+          <div class="flex justify-center gap-2">
+            <% pokemon.types.forEach(type => { %>
+              <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
+                <%= type %>
+              </span>
+            <% }); %>
+          </div>
+        </a>
+          
         </a>
 
       <% }) %>

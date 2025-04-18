@@ -116,11 +116,16 @@ async function handlePokemonRequest(req, res) {
 // Fetch specific Pokémon data
 async function fetchPokemonData(pokemonName) {
   const pokemon = await fetchPokemon(pokemonName);
-  const pokemonDescription = await fetchPokemonDescription(pokemon.id);
-  const types = await fetchTypes(pokemon);
-  const abilities = await fetchAbilities(pokemon);
-  const stats = await fetchStats(pokemon);
-  const evolutionStages = await fetchEvolutionChain(pokemon.id);
+
+  // Use Promise.all to fetch all data in parallel
+  const [pokemonDescription, types, abilities, stats, evolutionStages] =
+    await Promise.all([
+      fetchPokemonDescription(pokemon.id),
+      fetchTypes(pokemon),
+      fetchAbilities(pokemon),
+      fetchStats(pokemon),
+      fetchEvolutionChain(pokemon.id),
+    ]);
 
   return {
     pokemon,
@@ -244,7 +249,7 @@ function getPagination(currentPage, totalPages) {
 }
 
 //ROUTE TO FAVORITE PAGE
-app.get("/favorites", (req, res) => {
+app.get("/favorites", async (req, res) => {
   // Inisialisasi array favorit jika belum ada
   if (!req.session.favorites) {
     req.session.favorites = [];
@@ -256,9 +261,9 @@ app.get("/favorites", (req, res) => {
   });
 });
 
-// ROUTE TO ADD FAVORIT POKEMON
+// ROUTE TO ADD FAVORITE POKEMON
 app.post("/add-favorite", (req, res) => {
-  const { pokemonId, pokemonName, pokemonImage } = req.body;
+  const { pokemonId, pokemonName, pokemonImage, pokemonTypes } = req.body;
 
   if (!req.session.favorites) {
     req.session.favorites = [];
@@ -273,6 +278,7 @@ app.post("/add-favorite", (req, res) => {
       id: pokemonId,
       name: pokemonName,
       Image: pokemonImage,
+      types: pokemonTypes.split(","),
     });
   }
 

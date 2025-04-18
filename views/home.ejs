@@ -66,6 +66,7 @@
 
       <% if(result) { %>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <% console.log(result) %>
         <% result.results.map((pokemon, idx) => { %>
           <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col p-6 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
             <div class="flex justify-between"> 
@@ -89,6 +90,7 @@
                   <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
                   <input type="hidden" name="pokemonName" value="<%= pokemon.name %>">
                   <input type="hidden" name="pokemonImage" value="<%= pokemonShortData[idx].imgPokemon %>">
+                  <input type="hidden" name="pokemonTypes" value="<%= pokemonShortData[idx].types.join(',') %>">
                   <button type="submit" class="favorite-button"> <img src="/images/heart-regular.svg" alt="add Favorit" class="size-5"> </button>
                 </form>
               <% } %>
