@@ -267,16 +267,3 @@ app.get("/favorites", async (req, res) => {
     });
   }
 });
-
-app.post("/favorites/remove", (req, res) => {
-  const { pokemonId } = req.body;
-  let favs = req.session.favorites || [];
-
-  // filter sesi server
-  favs = favs.filter(
-    (item) => parseInt(item.pokemonId) !== parseInt(pokemonId)
-  );
-  req.session.favorites = favs;
-
-  res.json({ favorites: favs });
-});
