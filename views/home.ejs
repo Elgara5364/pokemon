@@ -114,67 +114,64 @@
 
       <script>
         document.addEventListener("DOMContentLoaded", () => {
-          // Ambil data favorit dari localStorage
+          // Fetch favorites once
           let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-      
-          // Loop semua tombol favorit
-          document.querySelectorAll(".favorite-btn").forEach(button => {
-            const {id : pokemonId , types, img : imgPokemon , name:pokemonName} = button.dataset
 
-            const pokemonTypes = types.split(",") // konversi dari string menjadi array
+          // Function to update button text based on favorites
+          function updateFavoriteButtons() {
+            document.querySelectorAll(".favorite-btn").forEach(button => {
+              const pokemonId = button.dataset.id;
+              const isFavorited = favorites.some(item => item.pokemonId === pokemonId);
+              button.textContent = isFavorited ? "❤️" : "🤍";
+            });
+          }
 
-            // Cek apakah pokemon ini difavoritkan
-            const isFavorited = favorites.map((item) => {
-              return item.pokemonId.includes(pokemonId);
-            })
-            button.textContent = isFavorited.includes(true) ? "❤️" : "🤍";
-      
-            // Tambahkan event klik per tombol
-            button.addEventListener("click", () => {
-              const index = favorites.indexOf(pokemonId);
-              const favoritesPokemon = favorites.map((item) => {
-                return item.pokemonId
-              })
-              // console.log(index)
+          // Event delegation for favorite buttons
+          document.querySelector(".grid").addEventListener("click", (event) => {
+            if (event.target.classList.contains("favorite-btn")) {
+              const button = event.target;
+              const pokemonId = button.dataset.id;
+              const pokemonName = button.dataset.name;
+              const imgPokemon = button.dataset.img;
+              const pokemonTypes = button.dataset.types.split(",");
 
-              if (favoritesPokemon.includes(pokemonId)) {
-                // Jika sudah ada, hapus dari favorit
-                favorites.splice(index);
+              const index = favorites.findIndex(item => item.pokemonId === pokemonId);
+
+              if (index !== -1) {
+                // Remove from favorites
+                favorites.splice(index, 1);
                 button.textContent = "🤍";
               } else {
-                // Jika belum ada, tambahkan
-                favorites.push({pokemonId,pokemonName , pokemonTypes , imgPokemon} );
+                // Add to favorites
+                favorites.push({ pokemonId, pokemonName, pokemonTypes, imgPokemon });
                 button.textContent = "❤️";
               }
-      
-              // Simpan kembali ke localStorage
+
+              // Save to localStorage
               localStorage.setItem("favorites", JSON.stringify(favorites));
-            });
+            }
           });
+
+          // Initial update of favorite buttons
+          updateFavoriteButtons();
         });
 
-
         function sendFavorites(event) {
-          event.preventDefault()
-          const favoritess = localStorage.getItem("favorites") || "[]"
-          console.log(favoritess)
+          event.preventDefault();
+          const favoritess = localStorage.getItem("favorites") || "[]";
 
-          fetch('/favorites' , {
-            method: "POST" ,
-            headers : {
-              'Content-Type' : 'application/json'
+          fetch('/favorites', {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
             },
-            body : favoritess
+            body: favoritess
           })
           .then(res => res.json())
           .then(() => {
             window.location.href = '/favorites';
           });
-
         }
-
-        sendFavorites(events)
-   
       </script>
       
   </body>

@@ -60,7 +60,19 @@ async function fetchAllPokemonData(page = 1, limit = 20) {
       `${API.POKEMON}?offset=${offset}&limit=${limit}`
     );
     const totalPages = Math.ceil(result.count / limit);
-    const pokemonShortData = await fetchPokemonShortData(result.results);
+
+    // Fetch all Pokémon details concurrently
+    const pokemonShortData = await Promise.all(
+      result.results.map(async (pokemon) => {
+        const { data } = await axios.get(pokemon.url);
+        return {
+          imgPokemon: data.sprites.other["official-artwork"].front_default,
+          id: data.id,
+          types: data.types.map((type) => type.type.name),
+        };
+      })
+    );
+
     return { result, pokemonShortData, totalPages };
   } catch (error) {
     console.error("Error fetching all Pokémon data:", error.message);
@@ -247,9 +259,6 @@ app.post("/favorites", (req, res) => {
 app.get("/favorites", async (req, res) => {
   try {
     const favorites = req.session.favorites || [];
-
-    //todo 1 : data belum bisa terkirim ke favorites.ejs
-    //todo 2 : ketika di refresh maka data di session hilang.
 
     res.render("favorites.ejs", { favorites });
   } catch (error) {

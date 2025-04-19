@@ -57,10 +57,8 @@
 
   <div class="flex justify-between mb-8">
   <h1 class="text-4xl font-bold text-indigo-800">Pokemon Favorit</h1>
-  <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Kembali</a></div>
+  <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" onclick="event.preventDefault(); window.history.back();">Kembali</a></div>
 
-
-  
   <div class="pokemon-list ">
 
     <% if (!favorites) { %>
