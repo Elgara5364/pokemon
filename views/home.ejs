@@ -158,14 +158,14 @@
 
         function sendFavorites(event) {
           event.preventDefault();
-          const favoritess = localStorage.getItem("favorites") || "[]";
+          const favorites = localStorage.getItem("favorites") || "[]";
 
           fetch('/favorites', {
             method: "POST",
             headers: {
               'Content-Type': 'application/json'
             },
-            body: favoritess
+            body: favorites
           })
           .then(res => res.json())
           .then(() => {

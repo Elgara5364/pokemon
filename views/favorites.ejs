@@ -57,38 +57,59 @@
 
   <div class="flex justify-between mb-8">
     <h1 class="text-4xl font-bold text-indigo-800"><a href="/">Pokemon Explorer</a></h1>
-  <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" onclick="event.preventDefault(); window.history.back();">Kembali</a></div>
+  <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" >Kembali</a></div>
 
   <div class="pokemon-list ">
 
     <% if (!favorites) { %>
       <p>Belum ada Pokemon favorit.</p>
     <% } else { %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <% favorites.forEach(pokemon => { %>
-          <a href="/get-pokemon/<%= pokemon.pokemonId %>" class="flex flex-col px-6 py-3 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
-          <div class="flex justify-between"><p class="text-lg font-bold">#<%= pokemon.pokemonId.toString().padStart(4, '0') %></p><form action="/remove-favorite" method="POST">
-            <input type="hidden" name="pokemonId" value="<%= pokemon.id %>">
-            <button type="submit" ><img src="/images/heart-solid.svg" alt="add Favorit" class="size-5"> </button>
-          </form></div>
-          <img src="<%= pokemon.imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2 ">
-          <h3 class="text-2xl font-semibold mb-3"><%= pokemon.pokemonName %></h3>
-          <div class="flex justify-center gap-2">
-            <% pokemon.pokemonTypes.map(type => { %>
-              <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
-                <%= type %>
-              </span>
-            <% }); %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+      <% favorites.forEach(pokemon => { %>
+        <div class="flex flex-col bg-gray-200 p-6  shadow-lg rounded-lg" id="fav-<%= pokemon.pokemonId %>">
+          <div class="flex justify-between">
+            <p class="text-lg font-bold">#<%= pokemon.pokemonId.toString().padStart(4, '0') %></p>
+            <input type="hidden" name="pokemonId" value="<%= pokemon.pokemonId %>">
+            <button type="button" class="favorite-btn" data-id="<%= pokemon.pokemonId %> ">
+              ❤️
+            </button>
           </div>
-        </a>
-          
-        </a>
-
-      <% }) %>
-    </div>
+          <a href="/get-pokemon/<%= pokemon.pokemonId %>" class="flex flex-col text-center transition-transform transform hover:scale-105 ">
+            <img src="<%= pokemon.imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2 ">
+            <h3 class="text-2xl font-semibold mb-3"><%= pokemon.pokemonName %></h3>
+            <div class="flex justify-center gap-2">
+              <% pokemon.pokemonTypes.map(type => { %>
+                <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
+                  <%= type %>
+                </span>
+              <% }); %>
+            </div>
+          </a>
+        </div>
+        <% }) %>
+      </div>
     <% } %>
   </div>
 
-  
+  <!-- todo kenapa '4 == '4' hasilnya false? -->
+  <script>
+   document.querySelector(".grid").addEventListener("click", async (event) => {
+    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+    if (event.target.classList.contains("favorite-btn")) {
+      const pokemonId = event.target.dataset.id
+      const updatedFavPokemon = favorites.filter((item, idx) => {
+        return (parseInt(item.pokemonId) !== parseInt(pokemonId))
+        
+      })
+      localStorage.setItem('favorites', JSON.stringify(updatedFavPokemon));
+   
+      const el = document.getElementById(`fav-${parseInt(pokemonId)}`);
+      if (el) el.remove();
+    }
+
+  });
+
+  </script>
 </body>
 </html>
