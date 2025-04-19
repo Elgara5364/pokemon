@@ -17,23 +17,18 @@ const API = {
 
 // Middleware setup
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(
+  session({ secret: "pokemonSecret", resave: false, saveUninitialized: true })
+);
 
 // Route definitions
 app.set("view engine", "ejs");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
-
-// express-session config
-app.use(
-  session({
-    secret: "pokemon-secret-key",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 },
-  })
-);
 
 app.get("/", async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -45,18 +40,12 @@ app.get("/", async (req, res) => {
 
   const pagination = getPagination(page, totalPages);
 
-  // initialize favorite array
-  if (!req.session.favorites) {
-    req.session.favorites = [];
-  }
-
   res.render("home.ejs", {
     result,
     pokemonShortData,
     currentPage: page,
     totalPages,
     pagination,
-    favorites: req.session.favorites,
   });
 });
 
@@ -248,54 +237,24 @@ function getPagination(currentPage, totalPages) {
   return pagination;
 }
 
-//ROUTE TO FAVORITE PAGE
-app.get("/favorites", async (req, res) => {
-  // Inisialisasi array favorit jika belum ada
-  if (!req.session.favorites) {
-    req.session.favorites = [];
-  }
+//ROUTE to FAVORITE PAGE
 
-  // Render halaman favorit
-  res.render("favorites", {
-    favorites: req.session.favorites,
-  });
+app.post("/favorites", (req, res) => {
+  req.session.favorites = req.body;
+  res.json({ status: "ok" });
 });
 
-// ROUTE TO ADD FAVORITE POKEMON
-app.post("/add-favorite", (req, res) => {
-  const { pokemonId, pokemonName, pokemonImage, pokemonTypes } = req.body;
+app.get("/favorites", async (req, res) => {
+  try {
+    const favorites = req.session.favorites || [];
 
-  if (!req.session.favorites) {
-    req.session.favorites = [];
-  }
+    //todo 1 : data belum bisa terkirim ke favorites.ejs
+    //todo 2 : ketika di refresh maka data di session hilang.
 
-  const isAlreadyFavorite = req.session.favorites.some(
-    (p) => p.id === pokemonId
-  );
-
-  if (!isAlreadyFavorite) {
-    req.session.favorites.push({
-      id: pokemonId,
-      name: pokemonName,
-      Image: pokemonImage,
-      types: pokemonTypes.split(","),
+    res.render("favorites.ejs", { favorites });
+  } catch (error) {
+    res.render("favorites.ejs", {
+      error: error.response?.data?.message || "Pokémon not found",
     });
   }
-
-  res.redirect(req.headers.referer || "/");
-});
-
-//ROUTE TO REMOVE FAVORITE POKEMON
-app.post("/remove-favorite", (req, res) => {
-  const { pokemonId } = req.body;
-
-  // Hapus Pokemon dari array favorit
-  if (req.session.favorites) {
-    req.session.favorites = req.session.favorites.filter(
-      (p) => p.id !== pokemonId
-    );
-  }
-
-  // Redirect kembali ke halaman sebelumnya
-  res.redirect(req.headers.referer || "/");
 });

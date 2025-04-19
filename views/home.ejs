@@ -59,53 +59,41 @@
           >
             Search
           </button>
-        <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg">Lihat Favorit</a>
+        <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg" onclick="sendFavorites(event)">Lihat Favorit</a>
 
         </div>
       </form>
 
       <% if(result) { %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <% result.results.map((pokemon, idx) => { %>
-          <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col p-6 bg-gray-200 rounded-lg text-center shadow-lg transition-transform transform hover:scale-105 ">
-            <div class="flex justify-between"> 
-              <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %></p>
+         <div class="bg-gray-200 p-6  shadow-lg ">
+            <div class="w-full flex justify-between"> 
+              <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %>
+              </p>
               <% 
               const pokemonId = pokemonShortData[idx].id ;
               const pokemonImg = pokemonShortData[idx].imgPokemon ;
-              const isFavorite = favorites.some((p) => {
-                let x = parseInt(p.id)
-                return x === pokemonId
-                
-              });
-              %>
-              <% if (isFavorite) { %>
-                <form action="/remove-favorite" method="POST">
-                  <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
-                  <button type="submit" class="favorite-button favorited"><img src="images/heart-solid.svg" alt="remove Favorit" class="size-5"></button>
-                </form>
-              <% } else { %>
-                <form action="/add-favorite" method="POST">
-                  <input type="hidden" name="pokemonId" value="<%= pokemonId %>">
-                  <input type="hidden" name="pokemonName" value="<%= pokemon.name %>">
-                  <input type="hidden" name="pokemonImage" value="<%= pokemonShortData[idx].imgPokemon %>">
-                  <input type="hidden" name="pokemonTypes" value="<%= pokemonShortData[idx].types.join(',') %>">
-                  <button type="submit" class="favorite-button"> <img src="/images/heart-regular.svg" alt="add Favorit" class="size-5"> </button>
-                </form>
-              <% } %>
+               %>
+
+
+              <div class="pokemon" data-id="<%= pokemon.id %>">
+                <button class="favorite-btn"  data-id="<%= pokemonShortData[idx].id %>" data-img="<%= pokemonShortData[idx].imgPokemon %>" data-types="<%= pokemonShortData[idx].types %>" data-name=" <%= pokemon.name %> ">❤️</button>
+              </div>
             </div>
-           
-            <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
-            <h2 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h2>
+            <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col  rounded-lg text-center transition-transform transform hover:scale-105 ">
+              <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
+              <h2 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h2>
             
-            <div class="flex justify-center gap-2">
-              <% pokemonShortData[idx].types.forEach(type => { %>
-                <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
-                  <%= type %>
-                </span>
-              <% }); %>
-            </div>
-          </a>
+              <div class="flex justify-center gap-2">
+                <% pokemonShortData[idx].types.forEach(type => { %>
+                  <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
+                    <%= type %>
+                  </span>
+                <% }); %>
+              </div>
+            </a>
+        </div>
         <% }) %>
       </div>
       
@@ -123,5 +111,71 @@
       </div>
 
       <% } %>
+
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          // Ambil data favorit dari localStorage
+          let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      
+          // Loop semua tombol favorit
+          document.querySelectorAll(".favorite-btn").forEach(button => {
+            const {id : pokemonId , types, img : imgPokemon , name:pokemonName} = button.dataset
+
+            const pokemonTypes = types.split(",") // konversi dari string menjadi array
+
+            // Cek apakah pokemon ini difavoritkan
+            const isFavorited = favorites.map((item) => {
+              return item.pokemonId.includes(pokemonId);
+            })
+            button.textContent = isFavorited.includes(true) ? "❤️" : "🤍";
+      
+            // Tambahkan event klik per tombol
+            button.addEventListener("click", () => {
+              const index = favorites.indexOf(pokemonId);
+              const favoritesPokemon = favorites.map((item) => {
+                return item.pokemonId
+              })
+              // console.log(index)
+
+              if (favoritesPokemon.includes(pokemonId)) {
+                // Jika sudah ada, hapus dari favorit
+                favorites.splice(index);
+                button.textContent = "🤍";
+              } else {
+                // Jika belum ada, tambahkan
+                favorites.push({pokemonId,pokemonName , pokemonTypes , imgPokemon} );
+                button.textContent = "❤️";
+              }
+      
+              // Simpan kembali ke localStorage
+              localStorage.setItem("favorites", JSON.stringify(favorites));
+            });
+          });
+        });
+
+
+        function sendFavorites(event) {
+          event.preventDefault()
+          const favoritess = localStorage.getItem("favorites") || "[]"
+          console.log(favoritess)
+
+          fetch('/favorites' , {
+            method: "POST" ,
+            headers : {
+              'Content-Type' : 'application/json'
+            },
+            body : favoritess
+          })
+          .then(res => res.json())
+          .then(() => {
+            window.location.href = '/favorites';
+          });
+
+        }
+
+        sendFavorites(events)
+   
+      </script>
+      
   </body>
 </html>
