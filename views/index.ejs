@@ -66,7 +66,7 @@
           >
             Search
           </button>
-          <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" onclick="event.preventDefault(); window.history.back();">Kembali</a>
+          <button id="goBack" type="button" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" >Kembali</button>
         </div>
       </form>
 
@@ -100,7 +100,12 @@
               />
               <div class="sm:flex sm:gap-5 sm:items-start">
               <div class="text-center sm:text-start mb-3">
-                <h2 class="opacity-80 font-bold text-xl">#<%= pokemon.id.toString().padStart(4, '0') %></>
+                <div class="flex justify-between">
+                  <h2 class="opacity-80 font-bold text-xl">#<%= pokemon.id.toString().padStart(4, '0') %></h2>
+                  <button type="button" class="favorite-btn" data-id="<%= pokemon.id %>" data-name="<%= pokemon.name %>" data-img="<%= pokemon.sprites.other['official-artwork'].front_default %>" data-types="<%= pokemon.types.map((item) => item.type.name) %>" >
+                    ❤️
+                  </button>
+                </div>
                 <h2 class="text-3xl font-bold capitalize"><%= pokemon.name %></h2>
                 <div class="flex gap-2 mt-3 justify-center sm:justify-start">
                   <% types.forEach(type => { %>
@@ -217,6 +222,43 @@
       <footer class="mt-12 text-center text-gray-500 text-sm">
         <p>Data provided by <a href="https://pokeapi.co/" class="underline">PokéAPI</a></p>
       </footer>
+
+      <script>
+        document.getElementById('goBack').addEventListener('click', function () {
+          const path = localStorage.getItem('lastPagePath') || '/';
+          window.location.href = path;
+        });
+
+        document.addEventListener("DOMContentLoaded", (req) => {
+          
+
+          let pokemonId = document.querySelector('.favorite-btn').dataset.id     
+          let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+          const isFavorited = favorites.some(item => parseInt(item.pokemonId) === parseInt(pokemonId))
+          document.querySelector('.favorite-btn').textContent = isFavorited ? "❤️" : "🤍";
+
+
+          document.querySelector(".favorite-btn").addEventListener('click', async (event)=> {
+            let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+            const isFavorited = favorites.some(item => parseInt(item.pokemonId) === parseInt(pokemonId))
+            const pokemonName =  document.querySelector('.favorite-btn').dataset.name;
+            const imgPokemon =  document.querySelector('.favorite-btn').dataset.img;
+            const pokemonTypes =  document.querySelector('.favorite-btn').dataset.types.split(",");
+
+            const index = favorites.findIndex(item => item.pokemonId === pokemonId);
+
+            if(!isFavorited) {
+              document.querySelector('.favorite-btn').textContent = "❤️"
+              favorites.push({pokemonId, pokemonName, pokemonTypes, imgPokemon})
+            } else {
+              favorites.splice(index, 1);
+              document.querySelector('.favorite-btn').textContent = "🤍"
+            }
+            localStorage.setItem('favorites', JSON.stringify(favorites))
+
+          })
+        })
+      </script>
     </div>
   </body>
 </html>

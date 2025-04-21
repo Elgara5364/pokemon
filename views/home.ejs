@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Pokemon Eksplorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
@@ -59,7 +59,7 @@
           >
             Search
           </button>
-        <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg" onclick="sendFavorites(event)">Lihat Favorit</a>
+        <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg" onclick="sendFavorites(event)" id="goToFavorite">Lihat Favorit</a>
 
         </div>
       </form>
@@ -113,7 +113,15 @@
       <% } %>
 
       <script>
+        document.getElementById('goToFavorite').addEventListener('click', function () {
+          const fullPath = window.location.pathname + window.location.search;
+          localStorage.setItem('lastPagePath', fullPath);
+        });
+
         document.addEventListener("DOMContentLoaded", () => {
+          const fullPath = window.location.pathname + window.location.search;
+          localStorage.setItem('lastHomePagePath', fullPath);
+
           // Fetch favorites once
           let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
 

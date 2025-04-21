@@ -52,12 +52,13 @@
     };
     
     return typeColors[type] || 'from-indigo-500 to-purple-600';
-  }
-%>
+    }
+  %>
 
   <div class="flex justify-between mb-8">
     <h1 class="text-4xl font-bold text-indigo-800"><a href="/">Pokemon Explorer</a></h1>
-  <a href="/" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" >Kembali</a></div>
+    <button id="goBack" type="button"  class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" >Kembali</button>
+    </div>
 
   <div class="pokemon-list ">
 
@@ -67,14 +68,15 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
       <% favorites.forEach(pokemon => { %>
         <div class="flex flex-col bg-gray-200 p-6  shadow-lg rounded-lg" id="fav-<%= pokemon.pokemonId %>">
-          <div class="flex justify-between">
-            <p class="text-lg font-bold">#<%= pokemon.pokemonId.toString().padStart(4, '0') %></p>
+          <div class="flex justify-between" >
+            <p class="text-lg font-bold">#<%= pokemon.pokemonId.toString().padStart(4, '0') %>
+            </p>
             <input type="hidden" name="pokemonId" value="<%= pokemon.pokemonId %>">
             <button type="button" class="favorite-btn" data-id="<%= pokemon.pokemonId %> ">
               ❤️
             </button>
           </div>
-          <a href="/get-pokemon/<%= pokemon.pokemonId %>" class="flex flex-col text-center transition-transform transform hover:scale-105 ">
+          <a href="/get-pokemon/<%= pokemon.pokemonId %>" class="flex flex-col text-center transition-transform transform hover:scale-105" onclick="updatePath()">
             <img src="<%= pokemon.imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2 ">
             <h3 class="text-2xl font-semibold mb-3"><%= pokemon.pokemonName %></h3>
             <div class="flex justify-center gap-2">
@@ -92,21 +94,32 @@
   </div>
 
   <!-- todo kenapa '4 == '4' hasilnya false? -->
-  <script>
-   document.querySelector(".grid").addEventListener("click", async (event) => {
-    let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+  <!-- todo ketika tekan kartu pokemon yang menuju index tidak bisa update localStorage lastPagePath-->
 
-    if (event.target.classList.contains("favorite-btn")) {
-      const pokemonId = event.target.dataset.id
-      const updatedFavPokemon = favorites.filter((item, idx) => {
-        return (parseInt(item.pokemonId) !== parseInt(pokemonId))
-        
-      })
-      localStorage.setItem('favorites', JSON.stringify(updatedFavPokemon));
-   
-      const el = document.getElementById(`fav-${parseInt(pokemonId)}`);
-      if (el) el.remove();
+  <script>
+    function updatePath(){
+      const fullPath = window.location.pathname + window.location.search;
+      localStorage.setItem('lastHomePagePath', fullPath);
     }
+
+    document.getElementById('goBack').addEventListener('click', function () {
+      const path = localStorage.getItem('lastPagePath') || '/';
+      window.location.href = path;
+    });
+    document.querySelector(".grid").addEventListener("click", async (event) => {
+      let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+      if (event.target.classList.contains("favorite-btn")) {
+        const pokemonId = event.target.dataset.id
+        const updatedFavPokemon = favorites.filter((item, idx) => {
+          return (parseInt(item.pokemonId) !== parseInt(pokemonId))
+          
+        })
+        localStorage.setItem('favorites', JSON.stringify(updatedFavPokemon));
+    
+        const el = document.getElementById(`fav-${parseInt(pokemonId)}`);
+        if (el) el.remove();
+      }
 
   });
 
