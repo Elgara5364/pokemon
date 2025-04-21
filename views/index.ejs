@@ -224,14 +224,13 @@
       </footer>
 
       <script>
+        // back to last page
         document.getElementById('goBack').addEventListener('click', function () {
           const path = localStorage.getItem('lastPagePath') || '/';
           window.location.href = path;
         });
 
         document.addEventListener("DOMContentLoaded", (req) => {
-          
-
           let pokemonId = document.querySelector('.favorite-btn').dataset.id     
           let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
           const isFavorited = favorites.some(item => parseInt(item.pokemonId) === parseInt(pokemonId))

@@ -97,13 +97,15 @@
   <!-- todo ketika tekan kartu pokemon yang menuju index tidak bisa update localStorage lastPagePath-->
 
   <script>
+    // update last page
     function updatePath(){
       const fullPath = window.location.pathname + window.location.search;
-      localStorage.setItem('lastHomePagePath', fullPath);
+      localStorage.setItem('lastPagePath', fullPath);
     }
 
+    // back to page before favorite page or last home page
     document.getElementById('goBack').addEventListener('click', function () {
-      const path = localStorage.getItem('lastPagePath') || '/';
+      const path = localStorage.getItem('lastHomePagePath') || '/';
       window.location.href = path;
     });
     document.querySelector(".grid").addEventListener("click", async (event) => {

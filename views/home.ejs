@@ -113,14 +113,16 @@
       <% } %>
 
       <script>
+        // get last page when go to favorite page
         document.getElementById('goToFavorite').addEventListener('click', function () {
           const fullPath = window.location.pathname + window.location.search;
-          localStorage.setItem('lastPagePath', fullPath);
+          localStorage.setItem('lastHomePagePath', fullPath);
         });
 
+        // get last page 
         document.addEventListener("DOMContentLoaded", () => {
           const fullPath = window.location.pathname + window.location.search;
-          localStorage.setItem('lastHomePagePath', fullPath);
+          localStorage.setItem('lastPagePath', fullPath);
 
           // Fetch favorites once
           let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
