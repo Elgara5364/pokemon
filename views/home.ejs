@@ -70,17 +70,18 @@
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg relative">
           <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
           <div class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
-            <% const types = ["Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark", "Fairy", "Normal", "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel"]; %>
+            <% const types = ["fire", "water", "grass", "electric", "psychic", "ice", "dragon", "dark", "fairy", "normal", "fighting", "flying", "poison", "ground", "rock", "bug", "ghost", "steel"]; %>
             <% types.forEach(function(type) { %>
               <label class="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-100 cursor-pointer">
-                <input type="radio" name="type" value="<%= type %>" class="accent-blue-600">
+                <input type="radio" name="type" value="<%= type %>" class="accent-blue-600" <%= selectedType === type ? 'checked' : '' %>>
                 <span class="capitalize"><%= type %></span>
+                
               </label>
             <% }); %>
           </div>
           <div class="mt-6 flex justify-end gap-2">
             <button id="cancelBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Batal</button>
-            <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+            <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button></div>
           </div>
         </div>
       </div>
@@ -259,6 +260,9 @@
 
           // Initial update of favorite buttons
           updateFavoriteButtons();
+          if (window.location.search.includes("reset")) {
+          alert("Filter telah direset");
+        }
         });
 
         function sendFavorites(event) {
@@ -277,6 +281,7 @@
             window.location.href = '/favorites';
           });
         }
+
       </script>
       
   </body>

@@ -45,6 +45,7 @@ app.get("/", async (req, res) => {
   const pagination = getPagination(page, totalPages);
 
   res.render("home.ejs", {
+    selectedType: pokemonType,
     result,
     pokemonShortData,
     currentPage: page,
