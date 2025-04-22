@@ -30,7 +30,6 @@
         steel: 'from-gray-500 to-gray-600',
         fairy: 'from-pink-300 to-pink-400'
       };
-      
       return typeColors[type] || 'from-indigo-500 to-purple-600';
     }
   %>
@@ -42,14 +41,13 @@
 
         <p class="text-gray-600 mt-2">Search for any Pokémon to see its details</p>
       </header>
-      
       <!-- Search Form -->
       <form method="post" action="/get-pokemon" id="pokemonForm" class="mb-8">
         <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
           <input 
-            id="pokemonInput" 
-            name="pokemon" 
-            placeholder="Enter ID or Pokémon name (e.g., pikachu, charizard)" 
+            id="pokemonInput"
+            name="pokemon"
+            placeholder="Enter ID or Pokémon name (e.g., pikachu, charizard)"
             class="flex-1 px-4 py-3 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
             required
           />
@@ -71,7 +69,6 @@
       <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg relative">
           <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
-      
           <div class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
             <% const types = ["Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark", "Fairy", "Normal", "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel"]; %>
             <% types.forEach(function(type) { %>
@@ -81,7 +78,6 @@
               </label>
             <% }); %>
           </div>
-      
           <div class="mt-6 flex justify-end gap-2">
             <button id="cancelBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Batal</button>
             <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
@@ -93,24 +89,18 @@
       <div id="pokemonList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
           <!-- PATH WHEN FILTER IS ACTIVE-->
         <% result.results.pokemon.map((pokemon, idx) => { %>
-         <div class="bg-gray-200 p-6  shadow-lg pokemon-card <%= idx >= 20 ? 'hidden extra-pokemon' : '' %>">
+        <div class="bg-gray-200 p-6  shadow-lg pokemon-card <%= idx >= 20 ? 'hidden extra-pokemon' : '' %>">
             <div class="w-full flex justify-between"> 
               <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %>
               </p>
               <% 
               const pokemonId = pokemonShortData[idx].id ;
               const pokemonImg = pokemonShortData[idx].imgPokemon ;
-               %>
-
-
-              <div class="pokemon" data-id="<%= pokemon.id %>">
-                <button class="favorite-btn"  data-id="<%= pokemonShortData[idx].id %>" data-img="<%= pokemonShortData[idx].imgPokemon %>" data-types="<%= pokemonShortData[idx].types %>" data-name=" <%= pokemon.name %> ">❤️</button>
-              </div>
+              %>
             </div>
             <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col  rounded-lg text-center transition-transform transform hover:scale-105 ">
               <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
               <h2 class="text-2xl font-semibold mb-3"><%= pokemon.pokemon.name %></h2>
-            
               <div class="flex justify-center gap-2">
                 <% pokemonShortData[idx].types.forEach(type => { %>
                   <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
@@ -122,7 +112,6 @@
         </div>
         <% }) %>
         <% console.log(result.results.pokemon.length > 20) %>
-       
       </div>
       <% if (result.results.pokemon.length > 20) { %>
         <div class="flex justify-center mt-6">
@@ -131,31 +120,23 @@
           </button>
         </div>
       <% } %>
-
     </div>
-
       <% } else { %> 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           <!-- PATH WHEN FILTER IS NOT ACTIVE-->
           <% result.results.map((pokemon, idx) => { %> 
-           <div class="bg-gray-200 p-6  shadow-lg ">
+          <div class="bg-gray-200 p-6  shadow-lg ">
               <div class="w-full flex justify-between"> 
                 <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %>
                 </p>
                 <% 
                 const pokemonId = pokemonShortData[idx].id ;
                 const pokemonImg = pokemonShortData[idx].imgPokemon ;
-                 %>
-  
-  
-                <div class="pokemon" data-id="<%= pokemon.id %>">
-                  <button class="favorite-btn"  data-id="<%= pokemonShortData[idx].id %>" data-img="<%= pokemonShortData[idx].imgPokemon %>" data-types="<%= pokemonShortData[idx].types %>" data-name=" <%= pokemon.name %> ">❤️</button>
-                </div>
+                %>
               </div>
               <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col  rounded-lg text-center transition-transform transform hover:scale-105 ">
                 <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
                 <h2 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h2>
-              
                 <div class="flex justify-center gap-2">
                   <% pokemonShortData[idx].types.forEach(type => { %>
                     <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
@@ -180,9 +161,7 @@
             <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Next</a>
           <% } %>
         </div>
-  
-
-      <% } %>
+        <% } %>
 
       <script>
 
