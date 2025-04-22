@@ -9,30 +9,30 @@
   <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
     <%
     // Function to get gradient colors based on Pokémon type
-    function getTypeGradient(type) {
-      const typeColors = {
-        normal: 'from-gray-400 to-gray-500',
-        fire: 'from-red-500 to-orange-500',
-        water: 'from-blue-500 to-blue-600',
-        grass: 'from-green-500 to-green-600',
-        electric: 'from-yellow-400 to-yellow-500',
-        ice: 'from-blue-200 to-blue-400',
-        fighting: 'from-red-700 to-red-800',
-        poison: 'from-purple-500 to-purple-600',
-        ground: 'from-yellow-600 to-yellow-700',
-        flying: 'from-indigo-300 to-indigo-400',
-        psychic: 'from-pink-500 to-pink-600',
-        bug: 'from-green-600 to-green-700',
-        rock: 'from-yellow-800 to-yellow-900',
-        ghost: 'from-purple-700 to-purple-800',
-        dark: 'from-gray-800 to-gray-900',
-        dragon: 'from-indigo-700 to-indigo-800',
-        steel: 'from-gray-500 to-gray-600',
-        fairy: 'from-pink-300 to-pink-400'
-      };
-      return typeColors[type] || 'from-indigo-500 to-purple-600';
-    }
-  %>
+      function getTypeGradient(type) {
+        const typeColors = {
+          normal: 'from-gray-400 to-gray-500',
+          fire: 'from-red-500 to-orange-500',
+          water: 'from-blue-500 to-blue-600',
+          grass: 'from-green-500 to-green-600',
+          electric: 'from-yellow-400 to-yellow-500',
+          ice: 'from-blue-200 to-blue-400',
+          fighting: 'from-red-700 to-red-800',
+          poison: 'from-purple-500 to-purple-600',
+          ground: 'from-yellow-600 to-yellow-700',
+          flying: 'from-indigo-300 to-indigo-400',
+          psychic: 'from-pink-500 to-pink-600',
+          bug: 'from-green-600 to-green-700',
+          rock: 'from-yellow-800 to-yellow-900',
+          ghost: 'from-purple-700 to-purple-800',
+          dark: 'from-gray-800 to-gray-900',
+          dragon: 'from-indigo-700 to-indigo-800',
+          steel: 'from-gray-500 to-gray-600',
+          fairy: 'from-pink-300 to-pink-400'
+        };
+        return typeColors[type] || 'from-indigo-500 to-purple-600';
+      }
+    %>
 
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
@@ -68,8 +68,6 @@
       <!-- Modal filter -->
       <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg relative">
-
-
           <div class="flex justify-between">
             <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
             <% if (selectedType) { %>
@@ -80,9 +78,10 @@
           </div>
           <div class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
             <% const types = ["fire", "water", "grass", "electric", "psychic", "ice", "dragon", "dark", "fairy", "normal", "fighting", "flying", "poison", "ground", "rock", "bug", "ghost", "steel"]; %>
+
             <% types.forEach(function(type) { %>
               <label class="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-100 cursor-pointer">
-                <input type="radio" name="type" value="<%= type %>" class="accent-blue-600" <%= selectedType === type ? 'checked' : '' %>>
+                <input type="radio" name="type" value="<%= type %>" class="accent-blue-600" <%= selectedType === type ? 'checked' : '' %> >
                 <span class="capitalize"><%= type %></span>
               </label>
             <% }); %>
@@ -93,7 +92,7 @@
                 <a href="/" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
                   Reset Filter
                 </a>
-
+              <% } %>
             <button id="cancelBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Batal</button>
             <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button></div>
           </div>
@@ -127,6 +126,7 @@
         </div>
         <% }) %>
       </div>
+
       <% if (result.results.pokemon.length > 20) { %>
         <div class="flex justify-center mt-6">
           <button id="loadMoreBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -134,6 +134,7 @@
           </button>
         </div>
       <% } %>
+
     </div>
       <% } else { %> 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -162,6 +163,7 @@
           </div>
           <% }) %>
         </div>
+      <% } %>
         
         <!-- Pagination Controls -->
         <div class="flex justify-center mt-8 space-x-2">
@@ -175,7 +177,6 @@
             <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Next</a>
           <% } %>
         </div>
-        <% } %>
 
       <script>
 
