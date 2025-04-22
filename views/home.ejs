@@ -68,6 +68,7 @@
       <!-- Modal filter -->
       <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg relative">
+<<<<<<< HEAD
           <div class="flex justify-between">
             <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
             <% if (selectedType) { %>
@@ -76,6 +77,9 @@
               </div>
             <% } %>
           </div>
+=======
+          <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
+>>>>>>> ddec2ae (Refactor home.ejs for improved readability and minor layout adjustments)
           <div class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
             <% const types = ["fire", "water", "grass", "electric", "psychic", "ice", "dragon", "dark", "fairy", "normal", "fighting", "flying", "poison", "ground", "rock", "bug", "ghost", "steel"]; %>
             <% types.forEach(function(type) { %>
@@ -86,6 +90,7 @@
               </label>
             <% }); %>
           </div>
+<<<<<<< HEAD
           <div class="mt-6 flex justify-end items-center gap-2">
             <div class="flex gap-3 justify-end">
               <% if (selectedType) { %>
@@ -93,6 +98,9 @@
                   Reset Filter
                 </a>
             <% } %>
+=======
+          <div class="mt-6 flex justify-end gap-2">
+>>>>>>> ddec2ae (Refactor home.ejs for improved readability and minor layout adjustments)
             <button id="cancelBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Batal</button>
             <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button></div>
           </div>
@@ -129,7 +137,7 @@
       <% if (result.results.pokemon.length > 20) { %>
         <div class="flex justify-center mt-6">
           <button id="loadMoreBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            Tampilkan Semua
+            Tampilkan lebih banyak
           </button>
         </div>
       <% } %>
