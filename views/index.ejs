@@ -91,7 +91,7 @@
       <% if (locals.pokemon) { %>
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
           <!-- Basic Info -->
-          <div class="bg-gradient-to-r <%= types && types.length > 0 ? getTypeGradient(types[0]) : 'from-indigo-500 to-purple-600' %> p-6 text-white">
+          <div class="bg-gradient-to-r <%= types && types.length > 0 ? getTypeGradient(types[0]) : 'from-indigo-500 to-purple-600' %> p-6 text-white relative">
             <div class="flex flex-col items-center sm:flex-row gap-3">
               <img 
                 src="<%= pokemon.sprites.other['official-artwork'].front_default %>" 
@@ -100,9 +100,9 @@
               />
               <div class="sm:flex sm:gap-5 sm:items-start">
               <div class="text-center sm:text-start mb-3">
-                <div class="flex justify-between">
+                <div class="sm:flex sm:justify-between">
                   <h2 class="opacity-80 font-bold text-xl">#<%= pokemon.id.toString().padStart(4, '0') %></h2>
-                  <button type="button" class="favorite-btn" data-id="<%= pokemon.id %>" data-name="<%= pokemon.name %>" data-img="<%= pokemon.sprites.other['official-artwork'].front_default %>" data-types="<%= pokemon.types.map((item) => item.type.name) %>" >
+                  <button type="button" class="favorite-btn absolute top-4 right-4 sm:static" data-id="<%= pokemon.id %>" data-name="<%= pokemon.name %>" data-img="<%= pokemon.sprites.other['official-artwork'].front_default %>" data-types="<%= pokemon.types.map((item) => item.type.name) %>" >
                     ❤️
                   </button>
                 </div>
