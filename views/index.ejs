@@ -109,7 +109,7 @@
                 <h2 class="text-3xl font-bold capitalize"><%= pokemon.name %></h2>
                 <div class="flex gap-2 mt-3 justify-center sm:justify-start">
                   <% types.forEach(type => { %>
-                    <span class="px-3 py-1 bg-white bg-opacity-30 rounded-full text-sm font-medium capitalize">
+                    <span class="px-3 py-1 bg-white bg-opacity-30 rounded-full text-sm font-medium capitalize bg-gradient-to-r <%= getTypeGradient(type) %>"  >
                       <%= type %>
                     </span>
                   <% }); %>
