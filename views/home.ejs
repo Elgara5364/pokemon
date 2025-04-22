@@ -68,7 +68,14 @@
       <!-- Modal filter -->
       <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg relative">
-          <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
+          <div class="flex justify-between">
+            <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
+            <% if (selectedType) { %>
+              <div class="mb-4 inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                Filter aktif: <span class="capitalize font-medium"><%= selectedType %></span>
+              </div>
+            <% } %>
+          </div>
           <div class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
             <% const types = ["fire", "water", "grass", "electric", "psychic", "ice", "dragon", "dark", "fairy", "normal", "fighting", "flying", "poison", "ground", "rock", "bug", "ghost", "steel"]; %>
             <% types.forEach(function(type) { %>
@@ -79,7 +86,13 @@
               </label>
             <% }); %>
           </div>
-          <div class="mt-6 flex justify-end gap-2">
+          <div class="mt-6 flex justify-end items-center gap-2">
+            <div class="flex gap-3 justify-end">
+              <% if (selectedType) { %>
+                <a href="/" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition">
+                  Reset Filter
+                </a>
+            <% } %>
             <button id="cancelBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Batal</button>
             <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button></div>
           </div>
@@ -112,7 +125,6 @@
             </a>
         </div>
         <% }) %>
-        <% console.log(result.results.pokemon.length > 20) %>
       </div>
       <% if (result.results.pokemon.length > 20) { %>
         <div class="flex justify-center mt-6">
