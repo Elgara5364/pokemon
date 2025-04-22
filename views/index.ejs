@@ -227,7 +227,19 @@
         // back to last page
         document.getElementById('goBack').addEventListener('click', function () {
           const path = localStorage.getItem('lastPagePath') || '/';
-          window.location.href = path;
+          const favorites = localStorage.getItem("favorites") || "[]";
+
+          fetch( '/favorites', {
+            method: "POST",
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: favorites
+          })
+          .then(res => res.json())
+          .then(() => {
+            window.location.href = path;
+          });
         });
 
         document.addEventListener("DOMContentLoaded", (req) => {
