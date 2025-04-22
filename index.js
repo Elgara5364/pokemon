@@ -10,6 +10,7 @@ const port = 3000;
 
 // API endpoints
 const API = {
+  TYPE: "https://pokeapi.co/api/v2/type/",
   POKEMON: "https://pokeapi.co/api/v2/pokemon/",
   SPECIES: "https://pokeapi.co/api/v2/pokemon-species/",
   ABILITY: "https://pokeapi.co/api/v2/ability/",
@@ -30,12 +31,15 @@ const __dirname = path.dirname(__filename);
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
+// HOMEPAGE
 app.get("/", async (req, res) => {
+  const pokemonType = req.query.type || null;
   const page = parseInt(req.query.page) || 1;
   const limit = 20; // Number of Pokémon per page
   const { result, pokemonShortData, totalPages } = await fetchAllPokemonData(
     page,
-    limit
+    limit,
+    pokemonType
   );
 
   const pagination = getPagination(page, totalPages);
@@ -53,45 +57,54 @@ app.get("/", async (req, res) => {
 app.listen(port, () => console.log(`Server running on port: ${port}`));
 
 // Fetch all Pokémon data with pagination
-async function fetchAllPokemonData(page = 1, limit = 20) {
+async function fetchAllPokemonData(page = 1, limit = 20, pokemonType) {
   try {
     const offset = (page - 1) * limit;
-    const { data: result } = await axios.get(
-      `${API.POKEMON}?offset=${offset}&limit=${limit}`
-    );
-    const totalPages = Math.ceil(result.count / limit);
 
-    // Fetch all Pokémon details concurrently
-    const pokemonShortData = await Promise.all(
-      result.results.map(async (pokemon) => {
-        const { data } = await axios.get(pokemon.url);
-        return {
-          imgPokemon: data.sprites.other["official-artwork"].front_default,
-          id: data.id,
-          types: data.types.map((type) => type.type.name),
-        };
-      })
-    );
+    if (!pokemonType) {
+      const { data: result } = await axios.get(
+        `${API.POKEMON}?offset=${offset}&limit=${limit}`
+      );
+      const totalPages = Math.ceil(result.count / limit);
 
-    return { result, pokemonShortData, totalPages };
+      // Fetch all Pokémon details concurrently
+      const pokemonShortData = await Promise.all(
+        result.results.map(async (pokemon) => {
+          const { data } = await axios.get(pokemon.url);
+          return {
+            imgPokemon: data.sprites.other["official-artwork"].front_default,
+            id: data.id,
+            types: data.types.map((type) => type.type.name),
+          };
+        })
+      );
+
+      return { result, pokemonShortData, totalPages };
+    } else {
+      const { data: results } = await axios.get(`${API.TYPE}` + pokemonType);
+
+      const totalPages = Math.ceil(
+        results.pokemon.filter((item) => item).length / limit
+      );
+
+      // Fetch all Pokémon details concurrently
+      const pokemonShortData = await Promise.all(
+        results.pokemon.map(async (pokemon) => {
+          const { data } = await axios.get(pokemon.pokemon.url);
+          return {
+            imgPokemon: data.sprites.other["official-artwork"].front_default,
+            id: data.id,
+            types: data.types.map((type) => type.type.name),
+          };
+        })
+      );
+
+      return { result: { results }, pokemonShortData, totalPages };
+    }
   } catch (error) {
     console.error("Error fetching all Pokémon data:", error.message);
     return { result: null, pokemonShortData: [], totalPages: 0 };
   }
-}
-
-// Fetch short data for each Pokémon
-async function fetchPokemonShortData(pokemonList) {
-  return Promise.all(
-    pokemonList.map(async (pokemon) => {
-      const { data } = await axios.get(pokemon.url);
-      return {
-        imgPokemon: data.sprites.other["official-artwork"].front_default,
-        id: data.id,
-        types: data.types.map((type) => type.type.name),
-      };
-    })
-  );
 }
 
 // Handle Pokémon search request

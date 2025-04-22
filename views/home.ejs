@@ -35,7 +35,7 @@
     }
   %>
 
-    <div class="max-w-3xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       <!-- Header -->
       <header class="text-center mb-8">
         <h1 class="text-4xl font-bold text-indigo-800"><a href="/">Pokemon Explorer</a></h1>
@@ -45,7 +45,7 @@
       
       <!-- Search Form -->
       <form method="post" action="/get-pokemon" id="pokemonForm" class="mb-8">
-        <div class="flex flex-wrap justify-center gap-4 max-w-xl mx-auto">
+        <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
           <input 
             id="pokemonInput" 
             name="pokemon" 
@@ -59,15 +59,41 @@
           >
             Search
           </button>
-        <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg" onclick="sendFavorites(event)" id="goToFavorite">Lihat Favorit</a>
-
+          <a href="/favorites" class="px-6 py-3 bg-white text-indigo-600 font-medium hover:text-indigo-900 transition-colors shadow-sm rounded-lg" onclick="sendFavorites(event)" id="goToFavorite">Lihat Favorit</a>
+          <button type="button" id="openFilterBtn" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 01.8 1.6l-5.6 7.4V19a1 1 0 01-1.45.9l-4-2A1 1 0 019 17v-5.6L3.2 5.6A1 1 0 013 4z" /></svg>
+            Filter
+          </button>
         </div>
       </form>
 
-      <% if(result) { %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <% result.results.map((pokemon, idx) => { %>
-         <div class="bg-gray-200 p-6  shadow-lg ">
+      <!-- Modal filter -->
+      <div id="filterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-lg relative">
+          <h2 class="text-xl font-bold mb-4">Pilih Satu Tipe Pokémon</h2>
+      
+          <div class="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto">
+            <% const types = ["Fire", "Water", "Grass", "Electric", "Psychic", "Ice", "Dragon", "Dark", "Fairy", "Normal", "Fighting", "Flying", "Poison", "Ground", "Rock", "Bug", "Ghost", "Steel"]; %>
+            <% types.forEach(function(type) { %>
+              <label class="flex items-center gap-2 px-3 py-2 border rounded-lg hover:bg-gray-100 cursor-pointer">
+                <input type="radio" name="type" value="<%= type %>" class="accent-blue-600">
+                <span class="capitalize"><%= type %></span>
+              </label>
+            <% }); %>
+          </div>
+      
+          <div class="mt-6 flex justify-end gap-2">
+            <button id="cancelBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-100">Batal</button>
+            <button id="saveFilterBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan</button>
+          </div>
+        </div>
+      </div>
+
+      <% if(result.results.pokemon) { %>
+      <div id="pokemonList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
+          <!-- PATH WHEN FILTER IS ACTIVE-->
+        <% result.results.pokemon.map((pokemon, idx) => { %>
+         <div class="bg-gray-200 p-6  shadow-lg pokemon-card <%= idx >= 20 ? 'hidden extra-pokemon' : '' %>">
             <div class="w-full flex justify-between"> 
               <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %>
               </p>
@@ -83,7 +109,7 @@
             </div>
             <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col  rounded-lg text-center transition-transform transform hover:scale-105 ">
               <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
-              <h2 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h2>
+              <h2 class="text-2xl font-semibold mb-3"><%= pokemon.pokemon.name %></h2>
             
               <div class="flex justify-center gap-2">
                 <% pokemonShortData[idx].types.forEach(type => { %>
@@ -95,24 +121,114 @@
             </a>
         </div>
         <% }) %>
+        <% console.log(result.results.pokemon.length > 20) %>
+       
       </div>
-      
-      <!-- Pagination Controls -->
-      <div class="flex justify-center mt-8 space-x-2">
-        <% if (currentPage > 1) { %>
-          <a href="?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Previous</a>
-        <% } %>
-        <% pagination.forEach(page => { %>
-          <a href="?page=<%= page %>" class="px-4 py-2 <%= page === currentPage ? 'bg-indigo-700 text-white' : 'bg-indigo-200 text-indigo-800' %> rounded-lg hover:bg-indigo-300 transition-colors"><%= page %></a>
-        <% }) %>
-        <% if (currentPage < totalPages) { %>
-          <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Next</a>
-        <% } %>
-      </div>
+      <% if (result.results.pokemon.length > 20) { %>
+        <div class="flex justify-center mt-6">
+          <button id="loadMoreBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Tampilkan Semua
+          </button>
+        </div>
+      <% } %>
+
+    </div>
+
+      <% } else { %> 
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <!-- PATH WHEN FILTER IS NOT ACTIVE-->
+          <% result.results.map((pokemon, idx) => { %> 
+           <div class="bg-gray-200 p-6  shadow-lg ">
+              <div class="w-full flex justify-between"> 
+                <p class="text-lg font-bold">#<%= pokemonShortData[idx].id.toString().padStart(4, '0') %>
+                </p>
+                <% 
+                const pokemonId = pokemonShortData[idx].id ;
+                const pokemonImg = pokemonShortData[idx].imgPokemon ;
+                 %>
+  
+  
+                <div class="pokemon" data-id="<%= pokemon.id %>">
+                  <button class="favorite-btn"  data-id="<%= pokemonShortData[idx].id %>" data-img="<%= pokemonShortData[idx].imgPokemon %>" data-types="<%= pokemonShortData[idx].types %>" data-name=" <%= pokemon.name %> ">❤️</button>
+                </div>
+              </div>
+              <a href="/get-pokemon/<%= pokemonShortData[idx].id %>" class="flex flex-col  rounded-lg text-center transition-transform transform hover:scale-105 ">
+                <img src="<%= pokemonShortData[idx].imgPokemon %>" alt="<%= pokemon.name %>" class="mx-auto mb-2">
+                <h2 class="text-2xl font-semibold mb-3"><%= pokemon.name %></h2>
+              
+                <div class="flex justify-center gap-2">
+                  <% pokemonShortData[idx].types.forEach(type => { %>
+                    <span class="px-3 py-1 bg-opacity-30 rounded-full text-sm font-medium capitalize flex gap-2 bg-gradient-to-r <%= getTypeGradient(type) %>">
+                      <%= type %>
+                    </span>
+                  <% }); %>
+                </div>
+              </a>
+          </div>
+          <% }) %>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="flex justify-center mt-8 space-x-2">
+          <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Previous</a>
+          <% } %>
+          <% pagination.forEach(page => { %>
+            <a href="?page=<%= page %>" class="px-4 py-2 <%= page === currentPage ? 'bg-indigo-700 text-white' : 'bg-indigo-200 text-indigo-800' %> rounded-lg hover:bg-indigo-300 transition-colors"><%= page %></a>
+          <% }) %>
+          <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Next</a>
+          <% } %>
+        </div>
+  
 
       <% } %>
 
       <script>
+
+        const pokemonCards = document.querySelectorAll('.pokemon-card');
+          const loadMoreBtn = document.getElementById('loadMoreBtn');
+          let visibleCount = 20;
+
+          loadMoreBtn?.addEventListener('click', () => {
+            const nextCount = visibleCount + 20;
+
+            // Tampilkan kartu dari index visibleCount sampai nextCount
+            for (let i = visibleCount; i < nextCount && i < pokemonCards.length; i++) {
+              pokemonCards[i].classList.remove('hidden');
+            }
+
+            visibleCount = nextCount;
+
+            // Kalau semua sudah terlihat, sembunyikan tombol
+            if (visibleCount >= pokemonCards.length) {
+              loadMoreBtn.remove();
+            }
+          });
+
+      const openBtn = document.getElementById("openFilterBtn");
+        const modal = document.getElementById("filterModal");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const saveBtn = document.getElementById("saveFilterBtn");
+
+        openBtn.addEventListener("click", () => modal.classList.remove("hidden"));
+        cancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
+
+        saveBtn.addEventListener("click", () => {
+          const selected = document.querySelector("input[name='type']:checked");
+          if (!selected) {
+            alert("Silakan pilih satu tipe Pokémon.");
+            return;
+          }
+
+          const selectedType = selected.value.toLowerCase();
+
+          // Redirect ke URL dengan query string
+          const url = new URL(window.location.href);
+          url.searchParams.set("type", selectedType); // satu tipe saja
+          window.location.href = "/?type=" + selectedType
+        });
+
         // get last page when go to favorite page
         document.getElementById('goToFavorite').addEventListener('click', function () {
           const fullPath = window.location.pathname + window.location.search;
