@@ -293,13 +293,28 @@ app.post("/compare", async (req, res) => {
     const pokemon1Stat = await fetchStats(pokemon1.data);
     const pokemon2Stat = await fetchStats(pokemon2.data);
 
+    const abilityDesc1 = pokemon1.data.abilities.map(
+      (ability) => ability.ability.url
+    );
+    const abilityDesc2 = pokemon2.data.abilities.map(
+      (ability) => ability.ability.url
+    );
+
+    const desc1 = await fetchAbilityDescriptions(abilityDesc1);
+    const desc2 = await fetchAbilityDescriptions(abilityDesc2);
+
     res.render("compare.ejs", {
       pokemon1,
       pokemon1Stat,
       pokemon2,
       pokemon2Stat,
+      desc1,
+      desc2,
     });
   } catch (error) {
-    console.log(error);
+    console.log(error.response?.data?.message || "Pokémon not found");
+    res.render("compare.ejs", {
+      error: error.response?.data?.message || "Pokémon not found",
+    });
   }
 });
