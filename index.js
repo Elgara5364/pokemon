@@ -281,3 +281,25 @@ app.get("/favorites", async (req, res) => {
     });
   }
 });
+
+app.get("/compare", (req, res) => {
+  res.render("compare.ejs");
+});
+
+app.post("/compare", async (req, res) => {
+  try {
+    const pokemon1 = await axios.get(API.POKEMON + req.body.pokemon1);
+    const pokemon2 = await axios.get(API.POKEMON + req.body.pokemon2);
+    const pokemon1Stat = await fetchStats(pokemon1.data);
+    const pokemon2Stat = await fetchStats(pokemon2.data);
+
+    res.render("compare.ejs", {
+      pokemon1,
+      pokemon1Stat,
+      pokemon2,
+      pokemon2Stat,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});

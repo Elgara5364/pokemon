@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Compare Pokemon</title>
+  </head>
+  <body class="p-8">
+    <h1>Hai</h1>
+    <form method="post" action="/compare" id="comparePokemon">
+      <div>
+        <label>Pokemon 1 :</label>
+        <input type="text" name="pokemon1" id="" required />
+      </div>
+      <div>
+        <label>Pokemon 2 :</label>
+        <input type="text" name="pokemon2" id="" required />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+
+    <% if(locals.pokemon1 && locals.pokemon2) { %>
+      <!-- console.log(pokemon1.data.name) -->
+      <!-- console.log(pokemon2.data.name) -->
+      
+      <div class="flex justify-center gap-10 max-w-3xl mx-auto">
+        <!-- POKEMON1  -->
+        <div class="w-1/2">
+          <div>
+            <div class="flex justify-between">
+              <h1 class="text-3xl font-bold capitalize"><%= pokemon1.data.name %> </h1>
+              <h2 class="opacity-80 font-bold text-xl">#<%= pokemon1.data.id.toString().padStart(4, '0') %></h2>
+            </div>
+            <img src="<%= pokemon1.data.sprites.other['official-artwork'].front_default %>" alt="<%= pokemon1.data.name %> ">
+            <p class="font-semibold"><%= pokemon1.data.abilities[0].ability.name %></p>
+            <p class="px-3 py-1 bg-white bg-opacity-30 rounded-full text-sm font-medium capitalize"><%= pokemon1.data.types[0].type.name %></p>
+          </div>
+          <div> 
+          <% 
+          // Map stat names to more readable names
+          const statNames = {
+            'hp': 'HP',
+            'attack': 'Attack',
+            'defense': 'Defense',
+            'special-attack': 'Sp. Atk',
+            'special-defense': 'Sp. Def',
+            'speed': 'Speed'
+          };
+          
+          // Map stat names to colors
+          const statColors = {
+            'hp': 'bg-red-500',
+            'attack': 'bg-orange-500',
+            'defense': 'bg-yellow-500',
+            'special-attack': 'bg-blue-500',
+            'special-defense': 'bg-green-500',
+            'speed': 'bg-pink-500'
+          }; %>
+
+          <% pokemon1Stat.forEach((stat) => { %>
+            <div class="flex items-center gap-3">
+              <div class="w-20 text-right font-medium">
+                <%= statNames[stat.name] || stat.name %>
+              </div>
+              <div class="text-right w-10 font-semibold">
+                <%= stat.value %>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div 
+                  class="h-full <%= statColors[stat.name] || 'bg-gray-500' %> rounded-full transition-all duration-1000"
+                  style="width: <%= stat.percentage %>%;">
+                </div>
+              </div>
+              <div class="w-8 text-xs text-gray-500"><%= stat.percentage %>%</div>
+            </div>
+          <% }); %>
+          
+          <!-- Total Stats -->
+            <div class="flex items-center gap-3 mt-2 pt-2 border-t">
+              <div class="w-20 text-right font-bold">Total</div>
+              <div class="text-right w-10 font-bold">
+                <%= pokemon1Stat.reduce((sum, stat) => sum + stat.value, 0) %>
+              </div>
+              <div class="flex-1"></div>
+              <div class="w-8"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POKEMON2  -->
+        <div class="w-1/2">
+          <div>
+            <div class="flex justify-between">
+              <h1 class="text-3xl font-bold capitalize"><%= pokemon2.data.name %> </h1>
+              <h2 class="opacity-80 font-bold text-xl">#<%= pokemon2.data.id.toString().padStart(4, '0') %></h2>
+            </div>
+            <img src="<%= pokemon2.data.sprites.other['official-artwork'].front_default %>" alt="<%= pokemon2.data.name %> ">
+            <p class="font-semibold"><%= pokemon2.data.abilities[0].ability.name %></p>
+            <p class="px-3 py-1 bg-white bg-opacity-30 rounded-full text-sm font-medium capitalize"><%= pokemon2.data.types[0].type.name %></p>
+          </div>
+          <div> 
+
+          <% pokemon2Stat.forEach((stat) => { %>
+            <div class="flex items-center gap-3">
+              <div class="w-20 text-right font-medium">
+                <%= statNames[stat.name] || stat.name %>
+              </div>
+              <div class="text-right w-10 font-semibold">
+                <%= stat.value %>
+              </div>
+              <div class="flex-1 bg-gray-200 rounded-full h-4 overflow-hidden">
+                <div 
+                  class="h-full <%= statColors[stat.name] || 'bg-gray-500' %> rounded-full transition-all duration-1000"
+                  style="width: <%= stat.percentage %>%;">
+                </div>
+              </div>
+              <div class="w-8 text-xs text-gray-500"><%= stat.percentage %>%</div>
+            </div>
+          <% }); %>
+          
+          <!-- Total Stats -->
+            <div class="flex items-center gap-3 mt-2 pt-2 border-t">
+              <div class="w-20 text-right font-bold">Total</div>
+              <div class="text-right w-10 font-bold">
+                <%= pokemon2Stat.reduce((sum, stat) => sum + stat.value, 0) %>
+              </div>
+              <div class="flex-1"></div>
+              <div class="w-8"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </body>
+</html>
