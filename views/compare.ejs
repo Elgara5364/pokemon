@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Compare Pokemon</title>
   </head>
@@ -27,11 +29,11 @@
       <!-- console.log(pokemon1.data.name) -->
       <!-- console.log(pokemon2.data.name) -->
       
-      <div class="flex flex-col lg:flex-row justify-center items-center gap-10 lg:max-w-3xl mx-auto">
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-10  mx-auto">
         <!-- POKEMON1  -->
-        <div class="w-1/2">
+        <div class="w-full sm:w-1/2">
           <div class="flex flex-col justify-center items-center gap-2 mb-4">
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between items-center w-full">
               <h1 class="text-3xl font-bold capitalize"><%= pokemon1.data.name %> </h1>
               <h2 class="opacity-80 font-bold text-xl">#<%= pokemon1.data.id.toString().padStart(4, '0') %></h2>
             </div>
@@ -116,9 +118,9 @@
         </div>
 
         <!-- POKEMON2  -->
-        <div class="w-1/2">
+        <div class="w-full sm:w-1/2">
           <div class="flex flex-col justify-center items-center gap-2 mb-4">
-            <div class="flex justify-between w-full">
+            <div class="flex justify-between items-center w-full">
               <h1 class="text-3xl font-bold capitalize"><%= pokemon2.data.name %> </h1>
               <h2 class="opacity-80 font-bold text-xl">#<%= pokemon2.data.id.toString().padStart(4, '0') %></h2>
             </div>
