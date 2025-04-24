@@ -314,7 +314,9 @@ app.post("/compare", async (req, res) => {
     });
   } catch (error) {
     res.render("compare.ejs", {
-      error: error.response?.data?.message || "Pokémon not found",
+      error:
+        error.response?.data?.message ||
+        "First pokemon or second pokemon or both not found",
     });
   }
 });
