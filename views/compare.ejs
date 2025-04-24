@@ -4,31 +4,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Compare Pokemon</title>
   </head>
-  <body class="p-8 max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <body class="p-8 max-w-3xl min-h-screen mx-auto bg-gradient-to-br from-blue-50 to-indigo-100">
     <header class="mb-8">
       <h1 class="text-4xl font-bold text-indigo-800 text-center">
         <a href="/">Pokemon Explorer</a>
       </h1>
     </header>
 
-    <form method="post" action="/compare" id="comparePokemon" class=" mx-auto flex gap-3 mb-5">
-      <div>
+    <form method="post" action="/compare" id="comparePokemon" class="flex flex-col gap-3 mb-5">
+      <div class="flex items-center">
         <label for="p1" class="text-xl font-bold text-indigo-800">Pokemon 1 :</label>
-        <input type="text" name="pokemon1" id="p1" class="flex-1 px-4 py-3 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" required />
+        <input type="text" name="pokemon1" id="p1" class="flex-1 grow ms-3 px-4 py-3 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" required />
       </div>
-      <div>
+      <div class="flex items-center">
         <label for="p2" class="text-xl font-bold text-indigo-800">Pokemon 2 :</label>
-        <input type="text" name="pokemon2" id="p2" class="flex-1 px-4 py-3 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" required />
+        <input type="text" name="pokemon2" id="p2" class="flex-1 grow px-4 py-3 rounded-lg border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm ms-3" required />
       </div>
       <button type="submit" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Submit</button>
     </form>
 
-    <!-- todo add error message if pokemon not found. dont forget add to favorite too -->
     <% if(locals.pokemon1 && locals.pokemon2) { %>
       <!-- console.log(pokemon1.data.name) -->
       <!-- console.log(pokemon2.data.name) -->
       
-      <div class="flex justify-center gap-10 max-w-3xl mx-auto">
+      <div class="flex flex-col lg:flex-row justify-center items-center gap-10 lg:max-w-3xl mx-auto">
         <!-- POKEMON1  -->
         <div class="w-1/2">
           <div class="flex flex-col justify-center items-center gap-2 mb-4">
