@@ -59,11 +59,25 @@
     <button id="goBack" type="button"  class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm" >Kembali</button>
   </div>
 
-  <div class="pokemon-list ">
+    <% if(favorites.length == 0 ) { %>
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-8 max-w-xl mx-auto">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <!-- Error icon -->
+            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm">Pokemon favorite is empty</p>
+          </div>
+        </div>
+      </div>
+    <% } %>
 
-    <% if (!favorites) { %>
-      <p>Belum ada Pokemon favorit.</p>
-    <% } else { %>
+    <div class="pokemon-list ">
+
+    <% if (favorites) { %>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
       <% favorites.forEach(pokemon => { %>
         <div class="flex flex-col bg-gray-200 p-6  shadow-lg rounded-lg" id="fav-<%= pokemon.pokemonId %>">
@@ -91,6 +105,8 @@
       </div>
     <% } %>
   </div>
+
+ 
 
   <script>
     // update last page

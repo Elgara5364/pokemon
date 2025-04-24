@@ -274,10 +274,10 @@ app.get("/favorites", async (req, res) => {
   try {
     const favorites = req.session.favorites || [];
 
-    res.render("favorites.ejs", { favorites });
+    res.render("favorites.ejs", { favorites, error: null });
   } catch (error) {
     res.render("favorites.ejs", {
-      error: error.response?.data?.message || "Pokémon not found",
+      error: error.response?.data?.message || "Belum ada Pokemon Favorit",
     });
   }
 });
