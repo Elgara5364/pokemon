@@ -283,7 +283,7 @@ app.get("/favorites", async (req, res) => {
 });
 
 app.get("/compare", (req, res) => {
-  res.render("compare.ejs");
+  res.render("compare.ejs", { error: null });
 });
 
 app.post("/compare", async (req, res) => {
@@ -310,9 +310,9 @@ app.post("/compare", async (req, res) => {
       pokemon2Stat,
       desc1,
       desc2,
+      error: null,
     });
   } catch (error) {
-    console.log(error.response?.data?.message || "Pokémon not found");
     res.render("compare.ejs", {
       error: error.response?.data?.message || "Pokémon not found",
     });

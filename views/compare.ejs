@@ -4,7 +4,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Compare Pokemon</title>
   </head>
-  <body class="p-8 max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-indigo-100">
+  <body class="p-8 max-w-4xl mx-auto bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
     <header class="mb-8">
       <h1 class="text-4xl font-bold text-indigo-800 text-center">
         <a href="/">Pokemon Explorer</a>
@@ -22,7 +22,7 @@
       </div>
       <button type="submit" class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Submit</button>
     </form>
-    
+
     <!-- todo add error message if pokemon not found. dont forget add to favorite too -->
     <% if(locals.pokemon1 && locals.pokemon2) { %>
       <!-- console.log(pokemon1.data.name) -->
@@ -180,6 +180,23 @@
               <div class="flex-1"></div>
               <div class="w-8"></div>
             </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+
+    <% if (error) { %>
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-8 max-w-xl mx-auto">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <!-- Error icon -->
+            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm"><%= error %></p>
           </div>
         </div>
       </div>
